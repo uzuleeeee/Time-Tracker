@@ -14,10 +14,20 @@ struct PersistenceController {
     static let preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-        }
+        
+        // Seed a few categories for the preview
+        let cat1 = Category(context: viewContext)
+        cat1.id = UUID()
+        cat1.name = "Work"
+        cat1.iconName = "briefcase.fill"
+        cat1.colorHex = "007AFF" // Blue
+
+        let cat2 = Category(context: viewContext)
+        cat2.id = UUID()
+        cat2.name = "Fitness"
+        cat2.iconName = "figure.run"
+        cat2.colorHex = "34C759" // Green
+        
         do {
             try viewContext.save()
         } catch {
