@@ -51,11 +51,21 @@
 			);
 			target = 4AC93BE02EF3B09B003D10ED /* TimeTrackerWidgetExtension */;
 		};
+		4AC93BFB2EF3B676003D10ED /* Exceptions for "Time Tracker" folder in "TimeTrackerWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Extensions/Color+Hex.swift",
+			);
+			target = 4AC93BE02EF3B09B003D10ED /* TimeTrackerWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4A3C48742EEB695400EA3BF9 /* Time Tracker */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4AC93BFB2EF3B676003D10ED /* Exceptions for "Time Tracker" folder in "TimeTrackerWidgetExtension" target */,
+			);
 			path = "Time Tracker";
 			sourceTree = "<group>";
 		};
