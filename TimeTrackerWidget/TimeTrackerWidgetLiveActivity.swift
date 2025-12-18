@@ -12,11 +12,13 @@ import SwiftUI
 struct TimeTrackerWidgetAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         // Dynamic stateful properties about your activity go here!
-        var emoji: String
+        let iconName: String
+        let startTime: Date
+        let colorHex: String
     }
 
     // Fixed non-changing properties about your activity go here!
-    var name: String
+    let id: UUID
 }
 
 struct TimeTrackerWidgetLiveActivity: Widget {
