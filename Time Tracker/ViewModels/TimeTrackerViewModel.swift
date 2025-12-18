@@ -116,7 +116,7 @@ class TimeTrackerViewModel: ObservableObject {
             )
             
             self.currentLiveActivity = activity
-            print("Live Activity started: \(activity.id)")
+            print("Live Activity started: \(activity.content.state.categoryName)")
         } catch {
             print("Failed to start Live Activity: ", error)
         }
