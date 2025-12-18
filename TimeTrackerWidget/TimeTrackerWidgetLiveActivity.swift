@@ -53,6 +53,8 @@ struct TimeTrackerWidgetLiveActivity: Widget {
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal)
+            .activityBackgroundTint(Color.black.opacity(0.8))
+//            .activitySystemActionForegroundColor(Color.primary)
 
         } dynamicIsland: { context in
             DynamicIsland {
@@ -101,8 +103,8 @@ extension TimeTrackerWidgetAttributes.ContentState {
     }
 }
 
-#Preview("Notification", as: .content, using: TimeTrackerWidgetAttributes.preview) {
-   TimeTrackerWidgetLiveActivity()
-} contentStates: {
-    .running
-}
+//#Preview("Notification", as: .content, using: TimeTrackerWidgetAttributes.preview) {
+//   TimeTrackerWidgetLiveActivity()
+//} contentStates: {
+//    .running
+//}

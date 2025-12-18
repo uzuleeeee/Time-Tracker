@@ -12,7 +12,7 @@ import SwiftUI
 struct TimeTrackerWidgetBundle: WidgetBundle {
     var body: some Widget {
         TimeTrackerWidget()
-        TimeTrackerWidgetControl()
+//        TimeTrackerWidgetControl()
         TimeTrackerWidgetLiveActivity()
     }
 }

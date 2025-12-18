@@ -16,7 +16,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4A6618D92EEE520400BC53AB"
+               BlueprintIdentifier = "4AC93BE02EF3B09B003D10ED"
                BuildableName = "TimeTrackerWidgetExtension.appex"
                BlueprintName = "TimeTrackerWidgetExtension"
                ReferencedContainer = "container:Time Tracker.xcodeproj">
@@ -62,7 +62,7 @@
          BundleIdentifier = "com.apple.springboard">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4A6618D92EEE520400BC53AB"
+            BlueprintIdentifier = "4AC93BE02EF3B09B003D10ED"
             BuildableName = "TimeTrackerWidgetExtension.appex"
             BlueprintName = "TimeTrackerWidgetExtension"
             ReferencedContainer = "container:Time Tracker.xcodeproj">

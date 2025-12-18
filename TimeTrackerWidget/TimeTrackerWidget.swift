@@ -76,9 +76,9 @@ struct TimeTrackerWidget: Widget {
     }
 }
 
-#Preview(as: .systemSmall) {
-    TimeTrackerWidget()
-} timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
-}
+//#Preview(as: .systemSmall) {
+//    TimeTrackerWidget()
+//} timeline: {
+//    SimpleEntry(date: .now, emoji: "😀")
+//    SimpleEntry(date: .now, emoji: "🤩")
+//}
