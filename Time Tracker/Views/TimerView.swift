@@ -61,7 +61,7 @@ struct TimerView: View {
                         id: UUID(),
                         name: "Sleep",
                         iconName: "powersleep",
-                        color: .blue),
+                        colorHex: "007AFF"),
                     startTime: Date().addingTimeInterval(-40000),
                     endTime: nil,
                     description: nil
@@ -76,7 +76,7 @@ struct TimerView: View {
                         id: UUID(),
                         name: "Fitness",
                         iconName: "figure.run",
-                        color: .green),
+                        colorHex: "008000"),
                     startTime: Date().addingTimeInterval(-1200),
                     endTime: nil,
                     description: "Marathon Training"
