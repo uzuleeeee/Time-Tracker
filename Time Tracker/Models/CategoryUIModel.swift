@@ -11,13 +11,17 @@ struct CategoryUIModel: Identifiable, Equatable {
     let id: UUID
     let name: String
     let iconName: String
-    let color: Color
+    let colorHex: String
     
     // Default placeholder when category data is unavailable
     static let empty = CategoryUIModel(
         id: UUID(),
         name: "Unknown",
         iconName: "questionmark.circle.fill",
-        color: .gray
+        colorHex: "#808080"
     )
+    
+    var color: Color {
+        Color(hex: colorHex)
+    }
 }

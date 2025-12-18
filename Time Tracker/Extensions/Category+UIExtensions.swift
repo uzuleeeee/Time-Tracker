@@ -14,7 +14,7 @@ extension Category {
             id: self.id ?? UUID(),
             name: self.name ?? "Unknown",
             iconName: self.iconName ?? "questionmark.circle.fill",
-            color: Color(hex: self.colorHex ?? "808080")
+            colorHex: self.colorHex ?? "808080"
         )
     }
 }

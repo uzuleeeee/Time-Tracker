@@ -29,7 +29,7 @@ struct IconView: View {
                 id: UUID(),
                 name: "Fitness",
                 iconName: "figure.run",
-                color: .green)
+                colorHex: "#008000")
         )
         .background(Color(.secondarySystemBackground))
     }

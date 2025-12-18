@@ -19,6 +19,9 @@ class TimeTrackerViewModel: ObservableObject {
     @Published var selectedCategory: Category?
     @Published var activityName: String = ""
     
+    // Live activity
+    private var currentLiveActivity: ActivityKit.Activity<TimeTrackerWidgetAttributes>?
+    
     // Actions
     
     func selectCategory(_ category: Category, currentActivity: Activity?) {
@@ -50,6 +53,8 @@ class TimeTrackerViewModel: ObservableObject {
             
             saveContext()
             
+            startLiveActivity(newActivity)
+            
             // Reset UI
             activityName = ""
         }
@@ -61,6 +66,8 @@ class TimeTrackerViewModel: ObservableObject {
         withAnimation {
             activity.endTime = Date()
             saveContext()
+            
+            stopLiveActivity()
         }
     }
     
@@ -83,6 +90,44 @@ class TimeTrackerViewModel: ObservableObject {
         } catch {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+    }
+    
+    // Live Activity
+    
+    private func startLiveActivity(_ activity: Activity) {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        
+        let uiModel = activity.uiModel
+        
+        let attributes = TimeTrackerWidgetAttributes(id: uiModel.id)
+        let state = TimeTrackerWidgetAttributes.ContentState(
+            categoryName: uiModel.category.name,
+            description: uiModel.description,
+            iconName: uiModel.category.iconName,
+            startTime: uiModel.startTime,
+            colorHex: uiModel.category.colorHex
+        )
+        
+        do {
+            let activity = try ActivityKit.Activity<TimeTrackerWidgetAttributes>.request(
+                attributes: attributes,
+                content: .init(state: state, staleDate: nil)
+            )
+            
+            self.currentLiveActivity = activity
+            print("Live Activity started: \(activity.id)")
+        } catch {
+            print("Failed to start Live Activity: ", error)
+        }
+    }
+    
+    private func stopLiveActivity() {
+        guard let currentLiveActivity else { return }
+        
+        Task {
+            await currentLiveActivity.end(nil, dismissalPolicy: .immediate)
+            self.currentLiveActivity = nil
         }
     }
 }
