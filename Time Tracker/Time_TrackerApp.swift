@@ -12,6 +12,10 @@ import CoreData
 struct Time_TrackerApp: App {
     let persistenceController = PersistenceController.shared
 
+    init() {
+        persistenceController.seedDefaultCategoriesIfNeeded()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
