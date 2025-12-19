@@ -27,6 +27,7 @@ struct ContentView: View {
     private var categories: FetchedResults<Category>
     
     @State private var sheetHeight: CGFloat = 0
+    @State var presentSheet = false
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -68,19 +69,10 @@ struct ContentView: View {
                     Divider()
                     
                     Button("Start New Activity") {
-                        
+                        presentSheet.toggle()
                     }
                     .buttonStyle(LargeButton())
                     .padding([.horizontal, .bottom], 16)
-                    
-//                    CategorySelectionView(
-//                        categories: Array(categories),
-//                        currentCategory: viewModel.selectedCategory,
-//                        onSelect: { category in
-//                            viewModel.selectCategory(category, currentActivity: currentActivity)
-//                        }
-//                    )
-//                    .padding(.vertical)
                 }
                 .background {
                     UnevenRoundedRectangle(
@@ -102,6 +94,18 @@ struct ContentView: View {
                 )
             }
             .ignoresSafeArea(edges: .bottom)
+        }
+        .sheet(isPresented: $presentSheet) {
+            CategorySelectionView(
+                categories: Array(categories),
+                currentCategory: viewModel.selectedCategory,
+                onSelect: { category in
+                    viewModel.selectCategory(category, currentActivity: currentActivity)
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color(.systemBackground))
         }
     }
 }
