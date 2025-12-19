@@ -10,7 +10,11 @@ import CoreData
 import ActivityKit
 
 struct ContentView: View {
-    @StateObject private var viewModel = TimeTrackerViewModel()
+    @StateObject private var viewModel: TimeTrackerViewModel
+    
+    init(context: NSManagedObjectContext) {
+        _viewModel = StateObject(wrappedValue: TimeTrackerViewModel(viewContext: context))
+    }
     
     @FetchRequest(
         entity: Activity.entity(),
@@ -131,5 +135,7 @@ struct LargeButton: ButtonStyle {
 }
 
 #Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    let context = PersistenceController.preview.container.viewContext
+    ContentView(context: context)
+        .environment(\.managedObjectContext, context)
 }

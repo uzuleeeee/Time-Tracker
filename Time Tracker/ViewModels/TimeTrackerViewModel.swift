@@ -12,8 +12,11 @@ internal import Combine
 
 @MainActor
 class TimeTrackerViewModel: ObservableObject {
-    // Dependencies
-    private let viewContext = PersistenceController.shared.container.viewContext
+    let viewContext: NSManagedObjectContext
+    
+    init(viewContext: NSManagedObjectContext) {
+        self.viewContext = viewContext
+    }
     
     // UI state
     @Published var selectedCategory: Category?
