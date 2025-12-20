@@ -33,6 +33,7 @@ struct StartActivityView: View {
                 
                 Section {
                     TextField("Description (Optional)", text: $descriptionText)
+                        .focused($isFocused)
                 }
             }
             .navigationTitle(Text("New Activity"))
