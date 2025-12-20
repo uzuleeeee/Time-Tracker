@@ -61,6 +61,7 @@ struct DailyCalendarView: View {
             }
             .padding(.vertical)
         }
+        .scrollIndicators(.hidden)
     }
 }
 
