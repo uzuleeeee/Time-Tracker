@@ -32,6 +32,7 @@ struct ContentView: View {
     
     @State private var sheetHeight: CGFloat = 0
     @State var presentSheet = false
+    @State private var selectedDate: Date = Date()
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -47,10 +48,17 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                DailyCalendarView(activities: Array(activities), selectedDate: Date())
-                    .safeAreaInset(edge: .bottom) {
-                        Color.clear.frame(height: sheetHeight + 10)
-                    }
+                VStack(spacing: 0) {
+                    DateSelectionView(selectedDate: $selectedDate)
+                        .padding(.top, 10)
+                    
+                    Divider()
+                    
+                    DailyCalendarView(activities: Array(activities), selectedDate: selectedDate)
+                }
+                .safeAreaInset(edge: .bottom) {
+                    Color.clear.frame(height: sheetHeight + 10)
+                }
                 
                 VStack {
                     HStack(spacing: 0) {
