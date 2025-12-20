@@ -55,6 +55,7 @@ struct ContentView: View {
                     Divider()
                     
                     DailyCalendarView(activities: Array(activities), selectedDate: selectedDate)
+                        .padding(.trailing)
                 }
                 .safeAreaInset(edge: .bottom) {
                     Color.clear.frame(height: sheetHeight + 10)
