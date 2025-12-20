@@ -107,7 +107,7 @@ struct FullContent: View {
                 .font(.caption)
                 .bold()
 
-            Text("\(uiModel.startHour):\(String(format: "%02d", uiModel.startMinute)) ~ \(uiModel.endHour):\(String(format: "%02d", uiModel.endMinute))")
+            Text("\(uiModel.startHour):\(String(format: "%02d", uiModel.startMinute)) - \(uiModel.endHour):\(String(format: "%02d", uiModel.endMinute))")
                 .font(.caption2)
         }
         .padding(6)
