@@ -39,18 +39,18 @@ struct PersistenceController {
         }
         
         // Categories
-        let sleep       = createCategory("Sleep", "bed.double.fill", "5856D6")
-        let morning     = createCategory("Morning Routine", "sunrise.fill", "FFD60A")
-        let work        = createCategory("Work", "briefcase.fill", "007AFF")
-        let coding      = createCategory("Coding", "laptopcomputer", "AF52DE")
-        let meeting     = createCategory("Meeting", "person.2.fill", "5AC8FA")
-        let breakCat    = createCategory("Break", "cup.and.saucer.fill", "FFA500")
-        let lunch       = createCategory("Lunch / Dinner", "fork.knife", "FF9F0A")
-        let errands     = createCategory("Errands", "cart.fill", "FF3B30")
-        let fitness     = createCategory("Fitness", "figure.run", "34C759")
-        let study       = createCategory("Study", "book.fill", "FFD60A")
-        let leisure     = createCategory("Leisure", "gamecontroller.fill", "FF2D55")
-        let meditation  = createCategory("Meditation", "brain.head.profile", "5AC8FA")
+        let sleep       = createCategory("Sleep", "🛌", "5856D6")
+        let morning     = createCategory("Morning Routine", "🌅", "FFD60A")
+        let work        = createCategory("Work", "💼", "007AFF")
+        let coding      = createCategory("Coding", "💻", "AF52DE")
+        let meeting     = createCategory("Meeting", "👥", "5AC8FA")
+        let breakCat    = createCategory("Break", "☕️", "FFA500")
+        let lunch       = createCategory("Lunch / Dinner", "🍽️", "FF9F0A")
+        let errands     = createCategory("Errands", "🛒", "FF3B30")
+        let fitness     = createCategory("Fitness", "🏃‍♂️", "34C759")
+        let study       = createCategory("Study", "📚", "FFD60A")
+        let leisure     = createCategory("Leisure", "🎮", "FF2D55")
+        let meditation  = createCategory("Meditation", "🧘‍♂️", "5AC8FA")
 
         // Activities
         createActivity(sleep, 0, 0, 420)         // 00:00 – 07:00
@@ -129,13 +129,13 @@ extension PersistenceController {
         }
         
         let defaults: [(String, String, String)] = [
-            ("Work", "briefcase.fill", "007AFF"),
-            ("Fitness", "figure.run", "34C759"),
-            ("Coding", "laptopcomputer", "AF52DE"),
-            ("Break", "cup.and.saucer.fill", "FFA500"),
-            ("Study", "book.fill", "FFD60A"),
-            ("Meditation", "brain.head.profile", "5AC8FA"),
-            ("Errands", "cart.fill", "FF3B30")
+            ("Work", "💼", "007AFF"),
+            ("Fitness", "🏃‍♂️", "34C759"),
+            ("Coding", "💻", "AF52DE"),
+            ("Break", "☕️", "FFA500"),
+            ("Study", "📚", "FFD60A"),
+            ("Meditation", "🧘‍♂️", "5AC8FA"),
+            ("Errands", "🛒", "FF3B30")
         ]
         
         for (name, icon, hex) in defaults {

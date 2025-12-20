@@ -60,7 +60,7 @@ struct TimerView: View {
                     category: CategoryUIModel(
                         id: UUID(),
                         name: "Sleep",
-                        iconName: "powersleep",
+                        iconName: "😴",
                         colorHex: "007AFF"),
                     startTime: Date().addingTimeInterval(-40000),
                     endTime: nil,
@@ -75,7 +75,7 @@ struct TimerView: View {
                     category: CategoryUIModel(
                         id: UUID(),
                         name: "Fitness",
-                        iconName: "figure.run",
+                        iconName: "🏃‍♂️",
                         colorHex: "008000"),
                     startTime: Date().addingTimeInterval(-1200),
                     endTime: nil,
