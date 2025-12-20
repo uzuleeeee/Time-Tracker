@@ -129,13 +129,66 @@ struct MinimalContent: View {
 }
 
 #Preview {
-    ZStack {
-        Color.black.edgesIgnoringSafeArea(.all)
-        
+    let viewContext = PersistenceController(inMemory: true).container.viewContext
+
+    let c1 = Category(context: viewContext)
+    c1.id = UUID()
+    c1.name = "Sleep"
+    c1.iconName = "😴"
+    c1.colorHex = "#5856D6"
+    
+    let c2 = Category(context: viewContext)
+    c2.id = UUID()
+    c2.name = "Sleep"
+    c2.iconName = "😴"
+    c2.colorHex = "#5856D6"
+    
+    let c3 = Category(context: viewContext)
+    c3.id = UUID()
+    c3.name = "Sleep"
+    c3.iconName = "😴"
+    c3.colorHex = "#5856D6"
+    
+    let c4 = Category(context: viewContext)
+    c4.id = UUID()
+    c4.name = "Sleep"
+    c4.iconName = "😴"
+    c4.colorHex = "#5856D6"
+
+    func createActivity(_ category: Category, _ h: Int, _ m: Int, _ duration: Int) -> Activity {
+        let activity = Activity(context: viewContext)
+        activity.id = UUID()
+        activity.category = category
+
+        guard let start = Calendar.current.date(
+            bySettingHour: h,
+            minute: m,
+            second: 0,
+            of: Date()
+        ) else {
+            fatalError("Invalid date")
+        }
+
+        activity.startTime = start
+        activity.endTime = Calendar.current.date(byAdding: .minute, value: duration, to: start)
+        return activity
+    }
+
+    let a1 = createActivity(c1, 0, 0, 5)
+    let a2 = createActivity(c2, 1, 0, 15)
+    let a3 = createActivity(c3, 2, 0, 45)
+    
+    
+    try? viewContext.save()
+
+    return ZStack {
+        Color.black.ignoresSafeArea()
+
         DailyCalendarView(
-            activities: Activity.examples,
+            activities: [a1, a2, a3],
             selectedDate: Date()
         )
+        .border(.red)
         .background(Color(.secondarySystemBackground))
     }
 }
