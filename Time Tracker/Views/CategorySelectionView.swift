@@ -42,6 +42,7 @@ struct CategoryButton: View {
                     .foregroundStyle(contentColor)
             }
         }
+        .buttonStyle(.borderless)
         .scaleEffect(isActive ? 1.05 : 1.0)
     }
     
