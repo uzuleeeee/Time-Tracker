@@ -15,6 +15,12 @@ struct DailyCalendarView: View {
     let hours = Array(0..<24)
     let hourHeight: CGFloat = 120
     
+    private let hourLabelWidth: CGFloat = 40
+    private let horizontalSpacing: CGFloat = 8
+    private var activityBlockIndent: CGFloat {
+        hourLabelWidth + horizontalSpacing
+    }
+    
     var selectedDateActivities: [Activity] {
         activities.filter { activity in
             guard let start = activity.startTime else { return false }
@@ -27,14 +33,14 @@ struct DailyCalendarView: View {
             ZStack(alignment: .topLeading) {
                 VStack(spacing: 0) {
                     ForEach(hours, id: \.self) { hour in
-                        HStack(alignment: .top, spacing: 8) {
+                        HStack(alignment: .top, spacing: horizontalSpacing) {
                             // Hour label
                             VStack {
                                 Text("\(hour):00")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
-                            .frame(width: 40, height: 0, alignment: .trailing)
+                            .frame(width: hourLabelWidth, height: 0, alignment: .trailing)
                             
                             // Horizontal line
                             Rectangle()
@@ -50,7 +56,7 @@ struct DailyCalendarView: View {
                         uiModel: activity.uiModel,
                         hourHeight: hourHeight
                     )
-                    .padding(.leading, 60)
+                    .padding(.leading, activityBlockIndent)
                 }
             }
             .padding(.vertical)
