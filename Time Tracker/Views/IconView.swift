@@ -25,7 +25,7 @@ struct IconView: View {
                     .padding(10)
                     .overlay (
                         Circle()
-                            .strokeBorder(uiModel.color, lineWidth: 3)
+                            .strokeBorder(uiModel.color.opacity(0.8), lineWidth: 3)
                     )
             }
         }
