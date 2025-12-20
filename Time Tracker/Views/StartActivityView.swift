@@ -32,8 +32,20 @@ struct StartActivityView: View {
                 }
                 
                 Section {
-                    TextField("Description (Optional)", text: $descriptionText)
-                        .focused($isFocused)
+                    HStack {
+                        TextField("Description (Optional)", text: $descriptionText)
+                            .focused($isFocused)
+                        
+                        if !descriptionText.isEmpty {
+                            Button(action: {
+                                descriptionText = ""
+                            }) {
+                                Image(systemName: "multiply.circle.fill")
+                                    .foregroundColor(.secondary)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
                 }
             }
             .navigationTitle(Text("New Activity"))
