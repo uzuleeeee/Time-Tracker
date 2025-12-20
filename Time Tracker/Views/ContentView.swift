@@ -100,11 +100,16 @@ struct ContentView: View {
             .ignoresSafeArea(edges: .bottom)
         }
         .sheet(isPresented: $presentSheet) {
-            CategorySelectionView(
+            StartActivityView(
                 categories: Array(categories),
-                currentCategory: viewModel.selectedCategory,
-                onSelect: { category in
+                onStart: { category, description in
+                    viewModel.activityName = description
                     viewModel.selectCategory(category, currentActivity: currentActivity)
+                    
+                    presentSheet = false
+                },
+                onCancel: {
+                    presentSheet = false
                 }
             )
             .presentationDetents([.medium])
