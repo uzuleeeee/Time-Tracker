@@ -75,7 +75,7 @@ struct ContentView: View {
                     Button("Start New Activity") {
                         presentSheet.toggle()
                     }
-                    .buttonStyle(LargeButton())
+                    .buttonStyle(LargeButtonStyle())
                     .padding([.horizontal, .bottom], 16)
                 }
                 .background {
@@ -115,26 +115,6 @@ struct ContentView: View {
             .presentationDragIndicator(.visible)
             .presentationBackground(Color(.systemBackground))
         }
-    }
-}
-
-struct LargeButton: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .frame(maxWidth: .infinity)
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color.accentColor)
-            )
-            .foregroundStyle(.white)
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .opacity(configuration.isPressed ? 0.9 : 1.0)
-            .animation(
-                .interactiveSpring(response: 0.25, dampingFraction: 0.7),
-                value: configuration.isPressed
-            )
     }
 }
 

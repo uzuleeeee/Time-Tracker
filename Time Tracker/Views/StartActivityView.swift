@@ -63,7 +63,7 @@ struct StartActivityView: View {
                 guard let category = selectedCategory else { return }
                 onStart(category, descriptionText)
             }
-            .buttonStyle(LargeButton())
+            .buttonStyle(LargeButtonStyle())
             .disabled(selectedCategory == nil)
             .opacity(selectedCategory == nil ? 0.5 : 1.0)
             .padding()
