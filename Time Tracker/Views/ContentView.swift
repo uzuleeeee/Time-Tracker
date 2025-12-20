@@ -112,7 +112,6 @@ struct ContentView: View {
                     presentSheet = false
                 }
             )
-            .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
             .presentationBackground(Color(.systemBackground))
         }
