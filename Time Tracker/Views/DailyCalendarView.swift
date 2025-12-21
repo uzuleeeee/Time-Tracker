@@ -9,6 +9,8 @@ import SwiftUI
 import CoreData
 
 struct DailyCalendarView: View {
+    @Environment(\.locale) var locale
+    
     var activities: [Activity]
     var selectedDate: Date = Date()
     
@@ -40,11 +42,14 @@ struct DailyCalendarView: View {
                         HStack(alignment: .top, spacing: horizontalSpacing) {
                             // Hour label
                             VStack {
-                                Text("\(hour):00")
+                                Text(formatHour(hour))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                    .minimumScaleFactor(0.8)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            .frame(width: hourLabelWidth, height: 0, alignment: .trailing)
+                            .frame(width: hourLabelWidth, alignment: .trailing)
+                            .frame(height: 0)
                             
                             // Horizontal line
                             Rectangle()
@@ -72,6 +77,28 @@ struct DailyCalendarView: View {
             .padding(.vertical)
         }
         .scrollIndicators(.hidden)
+    }
+    
+    private func formatHour(_ hour: Int) -> String {
+        let calendar = Calendar.current
+        
+        guard let date = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) else {
+            return "\(hour):00"
+        }
+        
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        
+        let formatString = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) ?? ""
+        let is12Hour = formatString.contains("a")
+        
+        if is12Hour {
+            formatter.dateFormat = "h a"
+        } else {
+            formatter.dateFormat = "H:mm"
+        }
+        
+        return formatter.string(from: date)
     }
 }
 
@@ -146,13 +173,27 @@ struct MinimalContent: View {
 }
 
 struct TimeIndicator: View {
+    @Environment(\.locale) var locale
+    
     let date: Date
     let hourHeight: CGFloat
     let hourLabelWidth: CGFloat
     let leadingIndent: CGFloat
     
     private var formattedTime: String {
-        date.formatted(date: .omitted, time: .shortened)
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        
+        let formatString = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) ?? ""
+        let is12Hour = formatString.contains("a")
+        
+        if is12Hour {
+            formatter.dateFormat = "h:mm"
+        } else {
+            formatter.dateFormat = "H:mm"
+        }
+        
+        return formatter.string(from: date)
     }
     
     var body: some View {
@@ -246,7 +287,9 @@ struct TimeIndicator: View {
             activities: [a1, a2, a3],
             selectedDate: Date()
         )
+//        .environment(\.locale, .init(identifier: "en_GB"))
         .border(.red)
         .background(Color(.secondarySystemBackground))
+        .environment(\.locale, .init(identifier: "en_US"))
     }
 }
