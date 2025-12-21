@@ -15,10 +15,14 @@ struct DailyCalendarView: View {
     let hours = Array(0..<24)
     let hourHeight: CGFloat = 120
     
-    private let hourLabelWidth: CGFloat = 40
+    private let hourLabelWidth: CGFloat = 55
     private let horizontalSpacing: CGFloat = 8
     private var activityBlockIndent: CGFloat {
         hourLabelWidth + horizontalSpacing
+    }
+    
+    private var selectedDateIsToday: Bool {
+        Calendar.current.isDateInToday(selectedDate)
     }
     
     var selectedDateActivities: [Activity] {
@@ -57,6 +61,12 @@ struct DailyCalendarView: View {
                         hourHeight: hourHeight
                     )
                     .padding(.leading, activityBlockIndent)
+                }
+                
+                if selectedDateIsToday {
+                    TimelineView(.everyMinute) { context in
+                        TimeIndicator(date: selectedDate, hourHeight: hourHeight, hourLabelWidth: hourLabelWidth, leadingIndent: activityBlockIndent)
+                    }
                 }
             }
             .padding(.vertical)
@@ -132,6 +142,47 @@ struct CompactContent: View {
 struct MinimalContent: View {
     var body: some View {
         Text("")
+    }
+}
+
+struct TimeIndicator: View {
+    let date: Date
+    let hourHeight: CGFloat
+    let hourLabelWidth: CGFloat
+    let leadingIndent: CGFloat
+    
+    private var formattedTime: String {
+        date.formatted(date: .omitted, time: .shortened)
+    }
+    
+    var body: some View {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        let minute = calendar.component(.minute, from: date)
+        
+        let offset = (CGFloat(hour) + CGFloat(minute) / 60.0) * hourHeight
+        
+        HStack(spacing: 0) {
+            Text(formattedTime)
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Capsule().fill(.red))
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(width: leadingIndent, alignment: .trailing)
+            
+            Rectangle()
+                .fill(.red)
+                .frame(height: 1)
+        }
+        .alignmentGuide(VerticalAlignment.center) { d in
+             d[VerticalAlignment.center]
+        }
+        .offset(y: offset)
+        .allowsHitTesting(false)
     }
 }
 
