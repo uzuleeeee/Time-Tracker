@@ -35,48 +35,68 @@ struct DailyCalendarView: View {
     }
     
     var body: some View {
-        ScrollView {
-            ZStack(alignment: .topLeading) {
-                VStack(spacing: 0) {
-                    ForEach(hours, id: \.self) { hour in
-                        HStack(alignment: .top, spacing: horizontalSpacing) {
-                            // Hour label
-                            VStack {
-                                Text(formatHour(hour))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .minimumScaleFactor(0.8)
-                                    .fixedSize(horizontal: false, vertical: true)
+        ScrollViewReader { proxy in
+            ScrollView {
+                ZStack(alignment: .topLeading) {
+                    VStack(spacing: 0) {
+                        ForEach(hours, id: \.self) { hour in
+                            HStack(alignment: .top, spacing: horizontalSpacing) {
+                                // Hour label
+                                VStack {
+                                    Text(formatHour(hour))
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .minimumScaleFactor(0.8)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .frame(width: hourLabelWidth, alignment: .trailing)
+                                .frame(height: 0)
+                                
+                                // Horizontal line
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 1)
                             }
-                            .frame(width: hourLabelWidth, alignment: .trailing)
-                            .frame(height: 0)
-                            
-                            // Horizontal line
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(height: 1)
+                            .frame(height: hourHeight, alignment: .top)
                         }
-                        .frame(height: hourHeight, alignment: .top)
+                    }
+                    
+                    ForEach(selectedDateActivities) { activity in
+                        ActivityBlock(
+                            uiModel: activity.uiModel,
+                            hourHeight: hourHeight
+                        )
+                        .padding(.leading, activityBlockIndent)
+                    }
+                    
+                    if selectedDateIsToday {
+                        TimelineView(.everyMinute) { context in
+                            TimeIndicator(date: selectedDate, hourHeight: hourHeight, hourLabelWidth: hourLabelWidth, leadingIndent: activityBlockIndent)
+                        }
                     }
                 }
-                
-                ForEach(selectedDateActivities) { activity in
-                    ActivityBlock(
-                        uiModel: activity.uiModel,
-                        hourHeight: hourHeight
-                    )
-                    .padding(.leading, activityBlockIndent)
+                .padding(.vertical)
+                .onAppear {
+                    scrollToCurrentTime(proxy: proxy)
                 }
-                
-                if selectedDateIsToday {
-                    TimelineView(.everyMinute) { context in
-                        TimeIndicator(date: selectedDate, hourHeight: hourHeight, hourLabelWidth: hourLabelWidth, leadingIndent: activityBlockIndent)
+                .onChange(of: selectedDate) { newDate in
+                    if Calendar.current.isDateInToday(newDate) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            scrollToCurrentTime(proxy: proxy)
+                        }
                     }
                 }
             }
-            .padding(.vertical)
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
+    }
+    
+    private func scrollToCurrentTime(proxy: ScrollViewProxy) {
+        let currentHour = Calendar.current.component(.hour, from: Date())
+        
+        withAnimation {
+            proxy.scrollTo(currentHour, anchor: .center)
+        }
     }
     
     private func formatHour(_ hour: Int) -> String {
