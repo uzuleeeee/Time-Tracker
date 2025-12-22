@@ -35,60 +35,74 @@ struct DailyCalendarView: View {
     }
     
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                ZStack(alignment: .topLeading) {
-                    VStack(spacing: 0) {
-                        ForEach(hours, id: \.self) { hour in
-                            HStack(alignment: .top, spacing: horizontalSpacing) {
-                                // Hour label
-                                VStack {
-                                    Text(formatHour(hour))
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .minimumScaleFactor(0.8)
-                                        .fixedSize(horizontal: false, vertical: true)
+        GeometryReader { geometry in
+            ScrollViewReader { proxy in
+                ScrollView {
+                    ZStack(alignment: .topLeading) {
+                        VStack(spacing: 0) {
+                            ForEach(hours, id: \.self) { hour in
+                                HStack(alignment: .top, spacing: horizontalSpacing) {
+                                    // Hour label
+                                    VStack {
+                                        Text(formatHour(hour))
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .minimumScaleFactor(0.8)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                    .frame(width: hourLabelWidth, alignment: .trailing)
+                                    .frame(height: 0)
+                                    
+                                    // Horizontal line
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.3))
+                                        .frame(height: 1)
                                 }
-                                .frame(width: hourLabelWidth, alignment: .trailing)
-                                .frame(height: 0)
-                                
-                                // Horizontal line
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(height: 1)
+                                .frame(height: hourHeight, alignment: .top)
                             }
-                            .frame(height: hourHeight, alignment: .top)
+                        }
+                        
+                        ForEach(selectedDateActivities) { activity in
+                            ActivityBlock(
+                                uiModel: activity.uiModel,
+                                hourHeight: hourHeight
+                            )
+                            .padding(.leading, activityBlockIndent)
+                        }
+                        
+                        if selectedDateIsToday {
+                            TimelineView(.everyMinute) { context in
+                                TimeIndicator(date: selectedDate, hourHeight: hourHeight, hourLabelWidth: hourLabelWidth, leadingIndent: activityBlockIndent)
+                            }
                         }
                     }
-                    
-                    ForEach(selectedDateActivities) { activity in
-                        ActivityBlock(
-                            uiModel: activity.uiModel,
-                            hourHeight: hourHeight
-                        )
-                        .padding(.leading, activityBlockIndent)
+                    .padding(.vertical)
+                    .onAppear {
+                        scrollToCurrentTime(proxy: proxy)
                     }
-                    
-                    if selectedDateIsToday {
-                        TimelineView(.everyMinute) { context in
-                            TimeIndicator(date: selectedDate, hourHeight: hourHeight, hourLabelWidth: hourLabelWidth, leadingIndent: activityBlockIndent)
+                    .onChange(of: selectedDate) { newDate in
+                        if Calendar.current.isDateInToday(newDate) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                scrollToCurrentTime(proxy: proxy)
+                            }
                         }
                     }
                 }
-                .padding(.vertical)
-                .onAppear {
-                    scrollToCurrentTime(proxy: proxy)
-                }
-                .onChange(of: selectedDate) { newDate in
-                    if Calendar.current.isDateInToday(newDate) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            scrollToCurrentTime(proxy: proxy)
-                        }
+                .scrollIndicators(.hidden)
+                .onPreferenceChange(ViewOffsetKey.self) { indicatorY in
+                    let containerHeight = geometry.size.height
+                    
+                    if indicatorY < 0 {
+                        print("Off screen UP")
+                    } else if indicatorY > containerHeight {
+                        print("Off screen DOWN")
+                    } else {
+                        print("On Screen: \(Int(indicatorY))")
                     }
                 }
             }
-            .scrollIndicators(.hidden)
         }
+        .coordinateSpace(name: "scroll")
     }
     
     private func scrollToCurrentTime(proxy: ScrollViewProxy) {
@@ -223,27 +237,46 @@ struct TimeIndicator: View {
         
         let offset = (CGFloat(hour) + CGFloat(minute) / 60.0) * hourHeight
         
-        HStack(spacing: 0) {
-            Text(formattedTime)
-                .font(.caption)
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(Capsule().fill(.red))
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-                .frame(width: leadingIndent, alignment: .trailing)
-            
-            Rectangle()
-                .fill(.red)
-                .frame(height: 1)
-        }
-        .alignmentGuide(VerticalAlignment.center) { d in
-             d[VerticalAlignment.center]
-        }
-        .offset(y: offset)
-        .allowsHitTesting(false)
+        Color.clear
+            .frame(height: offset)
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .preference(
+                            key: ViewOffsetKey.self,
+                            value: geo.frame(in: .named("scroll")).maxY
+                        )
+                }
+            )
+            .overlay(alignment: .bottomLeading) {
+                HStack(spacing: 0) {
+                    Text(formattedTime)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(.red))
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .frame(width: leadingIndent, alignment: .trailing)
+                    
+                    Rectangle()
+                        .fill(.red)
+                        .frame(height: 1)
+                }
+                .alignmentGuide(.bottom) { d in
+                     d[VerticalAlignment.center]
+                }
+            }
+            .allowsHitTesting(false)
+    }
+}
+
+struct ViewOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
@@ -300,6 +333,14 @@ struct TimeIndicator: View {
     
     try? viewContext.save()
 
+    let today = Date()
+    let fixedDate = Calendar.current.date(
+        bySettingHour: 9,
+        minute: 0,
+        second: 0,
+        of: today
+    )!
+    
     return ZStack {
         Color.black.ignoresSafeArea()
 
