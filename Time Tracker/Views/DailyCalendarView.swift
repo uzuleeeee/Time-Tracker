@@ -332,6 +332,8 @@ struct ViewOffsetKey: PreferenceKey {
 #Preview {
     let viewContext = PersistenceController(inMemory: true).container.viewContext
 
+    let fixedDate = Date()
+    
     let c1 = Category(context: viewContext)
     c1.id = UUID()
     c1.name = "Sleep"
@@ -365,7 +367,7 @@ struct ViewOffsetKey: PreferenceKey {
             bySettingHour: h,
             minute: m,
             second: 0,
-            of: Date()
+            of: fixedDate
         ) else {
             fatalError("Invalid date")
         }
@@ -375,20 +377,11 @@ struct ViewOffsetKey: PreferenceKey {
         return activity
     }
 
-    let a1 = createActivity(c1, 0, 0, 5)
-    let a2 = createActivity(c2, 1, 0, 15)
-    let a3 = createActivity(c3, 2, 0, 45)
-    
+    let a1 = createActivity(c1, 13, 0, 5)
+    let a2 = createActivity(c2, 14, 0, 15)
+    let a3 = createActivity(c3, 15, 0, 45)
     
     try? viewContext.save()
-
-    let today = Date()
-    let fixedDate = Calendar.current.date(
-        bySettingHour: 9,
-        minute: 0,
-        second: 0,
-        of: today
-    )!
     
     return ZStack {
         Color.black.ignoresSafeArea()
@@ -397,6 +390,7 @@ struct ViewOffsetKey: PreferenceKey {
             activities: [a1, a2, a3],
             selectedDate: fixedDate
         )
+        .environment(\.managedObjectContext, viewContext)
 //        .environment(\.locale, .init(identifier: "en_GB"))
         .border(.red)
         .background(Color(.secondarySystemBackground))
