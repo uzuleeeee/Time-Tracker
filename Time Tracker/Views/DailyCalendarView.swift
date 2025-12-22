@@ -23,6 +23,13 @@ struct DailyCalendarView: View {
         hourLabelWidth + horizontalSpacing
     }
     
+    enum TimeIndicatorPosition {
+        case visible
+        case up
+        case down
+    }
+    @State private var timeIndicatorPosition: TimeIndicatorPosition = .visible
+    
     private var selectedDateIsToday: Bool {
         Calendar.current.isDateInToday(selectedDate)
     }
@@ -72,7 +79,12 @@ struct DailyCalendarView: View {
                         
                         if selectedDateIsToday {
                             TimelineView(.everyMinute) { context in
-                                TimeIndicator(date: selectedDate, hourHeight: hourHeight, hourLabelWidth: hourLabelWidth, leadingIndent: activityBlockIndent)
+                                TimeIndicator(
+                                    date: context.date,
+                                    hourHeight: hourHeight,
+                                    hourLabelWidth: hourLabelWidth,
+                                    leadingIndent: activityBlockIndent
+                                )
                             }
                         }
                     }
@@ -92,17 +104,48 @@ struct DailyCalendarView: View {
                 .onPreferenceChange(ViewOffsetKey.self) { indicatorY in
                     let containerHeight = geometry.size.height
                     
-                    if indicatorY < 0 {
-                        print("Off screen UP")
-                    } else if indicatorY > containerHeight {
-                        print("Off screen DOWN")
+                    if indicatorY < -20 {
+                        timeIndicatorPosition = .up
+                    } else if indicatorY > containerHeight + 20 {
+                        timeIndicatorPosition = .down
                     } else {
-                        print("On Screen: \(Int(indicatorY))")
+                        timeIndicatorPosition = .visible
+                    }
+                }
+                .overlay(alignment: timeIndicatorPosition == .up ? .topLeading : .bottomLeading) {
+                    if selectedDateIsToday && timeIndicatorPosition != .visible {
+                        floatingTimeIndicator(proxy: proxy)
+                            .padding(.vertical, 16)
+                            .transition(.opacity.combined(with: .move(edge: timeIndicatorPosition == .up ? .top : .bottom)))
                     }
                 }
             }
         }
         .coordinateSpace(name: "scroll")
+        .animation(.easeInOut, value: timeIndicatorPosition)
+    }
+    
+    private func floatingTimeIndicator(proxy: ScrollViewProxy) -> some View {
+        Button {
+            scrollToCurrentTime(proxy: proxy)
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: timeIndicatorPosition == .up ? "arrow.up" : "arrow.down")
+                    .font(.caption2)
+                
+                TimelineView(.everyMinute) { context in
+                    Text(formatTime(context.date))
+                }
+            }
+            .font(.caption)
+            .fontWeight(.bold)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(Capsule().fill(.red))
+            .shadow(radius: 4, y: 2)
+        }
+        .frame(width: activityBlockIndent, alignment: .trailing)
     }
     
     private func scrollToCurrentTime(proxy: ScrollViewProxy) {
@@ -126,12 +169,18 @@ struct DailyCalendarView: View {
         let formatString = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) ?? ""
         let is12Hour = formatString.contains("a")
         
-        if is12Hour {
-            formatter.dateFormat = "h a"
-        } else {
-            formatter.dateFormat = "H:mm"
-        }
+        formatter.dateFormat = is12Hour ? "h a" : "H:mm"
+        return formatter.string(from: date)
+    }
+    
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = locale
         
+        let formatString = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: locale) ?? ""
+        let is12Hour = formatString.contains("a")
+        
+        formatter.dateFormat = is12Hour ? "h:mm" : "H:mm"
         return formatter.string(from: date)
     }
 }
@@ -346,7 +395,7 @@ struct ViewOffsetKey: PreferenceKey {
 
         DailyCalendarView(
             activities: [a1, a2, a3],
-            selectedDate: Date()
+            selectedDate: fixedDate
         )
 //        .environment(\.locale, .init(identifier: "en_GB"))
         .border(.red)
