@@ -15,13 +15,12 @@ struct LabelView: View {
     
     var body: some View {
         HStack {
-            Text(uiModel.iconName)
-            Text(uiModel.name)
-                .font(.system(.body, design: .rounded))
+            Text("\(uiModel.iconName) \(uiModel.name)")
+                .font(.system(.subheadline, design: .rounded))
                 .fontWeight(.medium)
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
         .background(
             Capsule()
                 .fill(Color(.secondarySystemBackground))
