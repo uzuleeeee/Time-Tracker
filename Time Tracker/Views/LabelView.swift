@@ -9,26 +9,11 @@ import SwiftUI
 
 struct LabelView: View {
     let uiModel: CategoryUIModel
-    var borderColor: Color = .clear
-    var borderWidth: CGFloat = 0
-    var shadowColor: Color = .clear
+    var isSelected: Bool = false
     
     var body: some View {
-        HStack {
-            Text("\(uiModel.iconName) \(uiModel.name)")
-                .font(.system(.subheadline, design: .rounded))
-                .fontWeight(.medium)
-        }
-        .padding(.vertical, 4)
-        .padding(.horizontal, 8)
-        .background(
-            Capsule()
-                .fill(Color(.secondarySystemBackground))
-                .shadow(color: shadowColor, radius: 4, x: 0, y: 2)
-        )
-        .overlay(
-            Capsule().strokeBorder(borderColor, lineWidth: borderWidth)
-        )
+        Text("\(uiModel.iconName) \(uiModel.name)")
+            .bubbleStyle(size: .small, isSelected: isSelected)
     }
 }
 
