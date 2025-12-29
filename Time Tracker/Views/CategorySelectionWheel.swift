@@ -27,14 +27,12 @@ struct CategorySelectionWheel: View {
                         LabelView(
                             uiModel: category.uiModel,
                             borderColor: isSelected ? Color.primary.opacity(0.5) : Color.clear,
-                            borderWidth: isSelected ? 2 : 0,
-                            shadowColor: isSelected ? Color.black.opacity(0.2) : .clear
+                            borderWidth: isSelected ? 2 : 0
                         )
                         .foregroundColor(.primary)
                     }
                 }
             }
-            .padding()
         }
     }
 }

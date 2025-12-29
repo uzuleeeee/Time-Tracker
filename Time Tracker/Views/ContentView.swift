@@ -30,9 +30,9 @@ struct ContentView: View {
     )
     private var categories: FetchedResults<Category>
     
-    @State private var sheetHeight: CGFloat = 0
-    @State var presentSheet = false
+    @State var selectedCategory: Category? = nil
     @State private var selectedDate: Date = Date()
+    @State private var inputText: String = ""
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -46,83 +46,36 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                VStack(spacing: 0) {
-                    DateSelectionView(selectedDate: $selectedDate)
-                        .padding(.top, 10)
+        VStack(spacing: 10) {
+            Spacer()
+            
+            CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+            
+            HStack {
+                TextField("What are you doing?", text: $inputText)
+                    .lineLimit(1)
+                    .textFieldStyle(.plain)
+                Button {
                     
-                    Divider()
-                    
-                    DailyCalendarView(activities: Array(activities), selectedDate: selectedDate)
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
                 }
-                .safeAreaInset(edge: .bottom) {
-                    Color.clear.frame(height: sheetHeight + 10)
-                }
-                
-                VStack {
-                    HStack(spacing: 0) {
-                        TimerView(uiModel: currentActivity?.uiModel ?? .empty)
-                        
-                        if let currentActivity {
-                            Button {
-                                viewModel.stopActivity(currentActivity)
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.title)
-                                    .foregroundStyle(.red)
-                                    .padding(.trailing)
-                            }
-                        }
-                    }
-                    .id(currentActivity?.id)
-                    .transition(.opacity.animation(.default))
-                    
-                    Divider()
-                    
-                    Button("Start New Activity") {
-                        presentSheet.toggle()
-                    }
-                    .buttonStyle(LargeButtonStyle())
-                    .padding([.horizontal, .bottom], 16)
-                }
-                .background {
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 24,
-                        bottomLeadingRadius: 0,
-                        bottomTrailingRadius: 0,
-                        topTrailingRadius: 24
-                    )
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: -5)
-                }
-                .background(
-                    GeometryReader { geo -> Color in
-                        DispatchQueue.main.async {
-                            self.sheetHeight = geo.size.height
-                        }
-                        return Color.clear
-                    }
-                )
             }
-            .ignoresSafeArea(edges: .bottom)
-        }
-        .sheet(isPresented: $presentSheet) {
-            StartActivityView(
-                categories: Array(categories),
-                onStart: { category, description in
-                    viewModel.activityName = description
-                    viewModel.selectCategory(category, currentActivity: currentActivity)
-                    
-                    presentSheet = false
-                },
-                onCancel: {
-                    presentSheet = false
-                }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .tint(.primary)
+            .background(
+                Capsule()
+                    .fill(Color(.secondarySystemBackground))
             )
-            .presentationDragIndicator(.visible)
-            .presentationBackground(Color(.systemBackground))
+            .overlay(
+                Capsule().strokeBorder(Color.gray.opacity(0.0), lineWidth: 1)
+            )
         }
+        .padding()
     }
 }
 
