@@ -18,7 +18,7 @@ struct CategorySelectionWheel: View {
                     let isSelected = selected?.id == category.id
                     
                     Button {
-                        if selected?.id == category.id {
+                        if isSelected {
                             selected = nil
                         } else {
                             selected = category
@@ -26,10 +26,9 @@ struct CategorySelectionWheel: View {
                     } label: {
                         LabelView(
                             uiModel: category.uiModel,
-                            borderColor: isSelected ? Color.primary.opacity(0.5) : Color.clear,
-                            borderWidth: isSelected ? 2 : 0
+                            isSelected: isSelected
                         )
-                        .foregroundColor(.primary)
+                        .tint(.primary)
                     }
                 }
             }
