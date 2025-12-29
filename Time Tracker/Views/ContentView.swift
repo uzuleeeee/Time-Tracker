@@ -73,16 +73,7 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .tint(.primary)
-            .background(
-                Capsule()
-                    .fill(Color(.secondarySystemBackground))
-            )
-            .overlay(
-                Capsule().strokeBorder(Color.gray.opacity(0.0), lineWidth: 1)
-            )
+            .bubbleStyle()
         }
         .padding()
     }

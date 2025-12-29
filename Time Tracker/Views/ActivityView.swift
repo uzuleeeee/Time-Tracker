@@ -34,43 +34,38 @@ struct ActivityView: View {
                     }
                 }
                 .bubbleStyle()
-            }
-            
-            if let startTime = uiModel.startTime {
-                if uiModel.endTime == nil {
-                    HStack {
-                        Spacer()
-                        
+                
+                if let startTime = uiModel.startTime {
+                    if uiModel.endTime == nil {
                         HStack {
-                            Text(startTime, style: .timer)
                             
-                            Button {
+                            
+                            HStack {
+                                Text(startTime, style: .timer)
                                 
-                            } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.primary)
+                                Button {
+                                    
+                                } label: {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.primary)
+                                }
                             }
-                        }
-                        .bubbleStyle()
-                    }
-                } else if let endTime = uiModel.endTime {
-                    let duration = endTime.timeIntervalSince(startTime)
-                    
-                    HStack(alignment: .bottom) {
-                        Text(TimeFormatter.format(duration: duration))
                             .bubbleStyle()
-                        
-                        if let endTime = uiModel.endTime {
-                            Text(endTime, format: .dateTime.hour().minute())
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .padding(.bottom, 4)
                         }
+                    } else if let endTime = uiModel.endTime {
+                        let duration = endTime.timeIntervalSince(startTime)
                         
-                        Spacer()
+                        HStack(alignment: .bottom) {
+                            Text(TimeFormatter.format(duration: duration))
+                                .bubbleStyle()
+                            
+                            
+                        }
                     }
                 }
             }
+            
+            
         }
     }
 }
