@@ -9,14 +9,9 @@ import SwiftUI
 
 struct ActivityView: View {
     let uiModel: ActivityUIModel
-    var borderColor: Color = .clear
-    var borderWidth: CGFloat = 0
-    var shadowColor: Color = .clear
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            
-            
+        VStack {
             HStack(alignment: .bottom) {
                 Spacer()
                 
@@ -27,76 +22,56 @@ struct ActivityView: View {
                         .padding(.bottom, 4)
                 }
                 
-                HStack {
-//                    Text(uiModel.category.iconName)
-//                        .font(.system(.body, design: .rounded))
-//                        .fontWeight(.medium)
-//                        .padding(.vertical, 4)
-//                        .padding(.horizontal, 8)
-//                        .background(Color.primary.opacity(0.05))
-//                        .cornerRadius(8)
-                    
-                    
+                Group {
                     if let description = uiModel.description {
                         Text(description)
                             .font(.system(.body, design: .rounded))
                             .fontWeight(.medium)
+                    } else {
+                        Text(uiModel.category.name)
+                            .font(.system(.body, design: .rounded))
+                            .fontWeight(.medium)
                     }
                 }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 16)
-                .background(
-                    Capsule()
-                        .fill(Color(.secondarySystemBackground))
-                        .shadow(color: shadowColor, radius: 4, x: 0, y: 2)
-                )
-                .overlay(
-                    Capsule().strokeBorder(borderColor, lineWidth: borderWidth)
-                )
-                
-                
+                .bubbleStyle()
             }
             
-            HStack(alignment: .bottom) {
-                if let startTime = uiModel.startTime {
-                    Group {
-                        if uiModel.endTime == nil {
-                            TimelineView(.periodic(from: .now, by: 60.0)) { context in
-                                let duration = context.date.timeIntervalSince(startTime)
-                                Text(TimeFormatter.format(duration: duration))
+            if let startTime = uiModel.startTime {
+                if uiModel.endTime == nil {
+                    HStack {
+                        Spacer()
+                        
+                        HStack {
+                            Text(startTime, style: .timer)
+                            
+                            Button {
+                                
+                            } label: {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.primary)
                             }
                         }
-                        else if let endTime = uiModel.endTime {
-                            let duration = endTime.timeIntervalSince(startTime)
-                            Text(TimeFormatter.format(duration: duration))
-                        }
+                        .bubbleStyle()
                     }
-                    .font(.system(.subheadline, design: .rounded))
-                    .fontWeight(.medium)
-                    .monospacedDigit()
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
-                    .background(
-                        Capsule()
-                            .fill(Color(.secondarySystemBackground))
-                            .shadow(color: shadowColor, radius: 4, x: 0, y: 2)
-                    )
-                    .overlay(
-                        Capsule().strokeBorder(borderColor, lineWidth: borderWidth)
-                    )
+                } else if let endTime = uiModel.endTime {
+                    let duration = endTime.timeIntervalSince(startTime)
+                    
+                    HStack(alignment: .bottom) {
+                        Text(TimeFormatter.format(duration: duration))
+                            .bubbleStyle()
+                        
+                        if let endTime = uiModel.endTime {
+                            Text(endTime, format: .dateTime.hour().minute())
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .padding(.bottom, 4)
+                        }
+                        
+                        Spacer()
+                    }
                 }
-                
-                if let endTime = uiModel.endTime {
-                    Text(endTime, format: .dateTime.hour().minute())
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, 4)
-                }
-                
-                Spacer()
             }
         }
-//        .frame(maxWidth: .infinity)
     }
 }
 
