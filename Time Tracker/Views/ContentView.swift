@@ -18,7 +18,7 @@ struct ContentView: View {
     
     @FetchRequest(
         entity: Activity.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Activity.startTime, ascending: false)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Activity.startTime, ascending: true)],
         animation: .default
     )
     private var activities: FetchedResults<Activity>
@@ -47,6 +47,15 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 10) {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .trailing, spacing: 15) {
+                    ForEach(activities) { activity in
+                        ActivityView(uiModel: activity.uiModel)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            
             Spacer()
             
             CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
