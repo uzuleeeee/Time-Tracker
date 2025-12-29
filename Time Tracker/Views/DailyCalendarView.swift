@@ -15,7 +15,12 @@ struct DailyCalendarView: View {
     var selectedDate: Date = Date()
     
     let hours = Array(0..<24)
-    let hourHeight: CGFloat = 120
+    
+    @State var hourHeight: CGFloat = 120
+    private let minHourHeight: CGFloat = 20
+    private let maxHourHeight: CGFloat = 300
+    
+    @State private var currentMagnification: CGFloat = 1.0
     
     private let hourLabelWidth: CGFloat = 55
     private let horizontalSpacing: CGFloat = 8
@@ -89,6 +94,22 @@ struct DailyCalendarView: View {
                         }
                     }
                     .padding(.vertical)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .highPriorityGesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                let delta = value / currentMagnification
+                                let newHeight = hourHeight * delta
+                                
+                                hourHeight = min(max(newHeight, minHourHeight), maxHourHeight)
+                                
+                                currentMagnification = value
+                            }
+                            .onEnded { _ in
+                                currentMagnification = 1.0
+                            }
+                    )
                     .onAppear {
                         scrollToCurrentTime(proxy: proxy)
                     }
@@ -191,31 +212,75 @@ struct ActivityBlock: View {
     
     let minimumHeight: CGFloat = 0
     
+    private let circleDiameter: CGFloat = 24
+    private let lineWidth: CGFloat = 8
+    
     var body: some View {
         let topOffset = (CGFloat(uiModel.startHour) + CGFloat(uiModel.startMinute) / 60.0) * hourHeight
         let height = CGFloat(uiModel.durationMinutes) / 60 * hourHeight
         
         let displayHeight = max(height, minimumHeight)
         
-        RoundedRectangle(cornerRadius: 8)
-            .frame(height: displayHeight)
-            .foregroundStyle(uiModel.category.color.opacity(0.3))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(uiModel.category.color, lineWidth: 2)
-            )
-            .overlay(alignment: .topLeading) {
-                ViewThatFits(in: .vertical) {
-                    FullContent(uiModel: uiModel)
-                        .fixedSize(horizontal: false, vertical: true)
-                    CompactContent(uiModel: uiModel)
-                        .fixedSize(horizontal: false, vertical: true)
-                    MinimalContent()
-                }
+        HStack(alignment: .top) {
+            ZStack(alignment: .top) {
+                Capsule()
+                    .fill(uiModel.category.color)
+                    .frame(width: lineWidth, height: displayHeight)
+                
+//                Circle()
+//                    .fill(uiModel.category.color)
+//                    .frame(width: circleDiameter)
+//                    .offset(y: -circleDiameter / 2)
+                
+//                Circle()
+//                    .fill(Color(.secondarySystemBackground))
+//                    .frame(width: circleDiameter / 2)
+//                    .offset(y: -(circleDiameter / 2) / 2)
             }
-            .clipped()
-            .offset(y: topOffset)
-            .contentShape(Rectangle())
+            
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 4) {
+                    Text(uiModel.category.iconName)
+                        .font(.caption)
+                    
+                    Text(uiModel.category.name)
+                        .font(.caption)
+                        .bold()
+                        .foregroundStyle(.primary)
+                }
+                
+                VStack(alignment: .leading) {
+                    Text("\(formatTime(uiModel.startTime)) - \(formatTime(uiModel.endTime))")
+                    Text(formatDuration(uiModel.durationMinutes))
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            }
+            .padding(4)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(4)
+            .offset(y: -circleDiameter / 2 - 4)
+        }
+        .offset(y: topOffset)
+        .contentShape(Rectangle())
+    }
+    
+    private func formatTime(_ date: Date?) -> String {
+        guard let date = date else { return "" }
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+    
+    private func formatDuration(_ minutes: Double) -> String {
+        let hours = Int(minutes) / 60
+        let mins = Int(minutes) % 60
+        
+        if hours > 0 {
+            return "\(hours)h \(mins)m"
+        } else {
+            return "\(mins)m"
+        }
     }
 }
 
@@ -379,7 +444,7 @@ struct ViewOffsetKey: PreferenceKey {
 
     let a1 = createActivity(c1, 13, 0, 5)
     let a2 = createActivity(c2, 14, 0, 15)
-    let a3 = createActivity(c3, 15, 0, 45)
+    let a3 = createActivity(c3, 15, 0, 60)
     
     try? viewContext.save()
     
@@ -387,7 +452,7 @@ struct ViewOffsetKey: PreferenceKey {
         Color.black.ignoresSafeArea()
 
         DailyCalendarView(
-            activities: [a1, a2, a3],
+            activities: Activity.examples,
             selectedDate: fixedDate
         )
         .environment(\.managedObjectContext, viewContext)
