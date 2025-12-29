@@ -9,6 +9,9 @@ import SwiftUI
 
 struct LabelView: View {
     let uiModel: CategoryUIModel
+    var borderColor: Color = .clear
+    var borderWidth: CGFloat = 0
+    var shadowColor: Color = .clear
     
     var body: some View {
         HStack {
@@ -19,10 +22,13 @@ struct LabelView: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(Capsule())
+        .background(
+            Capsule()
+                .fill(Color(.secondarySystemBackground))
+                .shadow(color: shadowColor, radius: 4, x: 0, y: 2)
+        )
         .overlay(
-            Capsule().stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            Capsule().strokeBorder(borderColor, lineWidth: borderWidth)
         )
     }
 }
