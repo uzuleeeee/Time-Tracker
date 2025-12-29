@@ -27,10 +27,11 @@ struct PersistenceController {
             return category
         }
         
-        func createActivity(_ category: Category, _ h: Int, _ m: Int, _ duration: Int) {
+        func createActivity(_ category: Category, _ h: Int, _ m: Int, _ duration: Int, _ name: String) {
             let activity = Activity(context: viewContext)
             activity.id = UUID()
             activity.category = category
+            activity.name = name
             
             guard let start = calendar.date(bySettingHour: h, minute: m, second: 0, of: today) else { return }
             let end = calendar.date(byAdding: .minute, value: duration, to: start)
@@ -53,30 +54,30 @@ struct PersistenceController {
         let meditation  = createCategory("Meditation", "🧘‍♂️", "5AC8FA")
 
         // Activities
-        createActivity(sleep, 0, 0, 420)         // 00:00 – 07:00
-        createActivity(morning, 7, 0, 30)        // 07:00 – 07:30
-        createActivity(fitness, 7, 30, 45)       // 07:30 – 08:15
-        createActivity(breakCat, 8, 15, 15)      // 08:15 – 08:30
+        createActivity(sleep, 0, 0, 420, "Zzz")                     // 00:00 – 07:00
+        createActivity(morning, 7, 0, 30, "Coffee")                 // 07:00 – 07:30
+        createActivity(fitness, 7, 30, 45, "Gym")                   // 07:30 – 08:15
+        createActivity(breakCat, 8, 15, 15, "Scroll")               // 08:15 – 08:30
 
-        createActivity(work, 8, 30, 90)          // 08:30 – 10:00
-        createActivity(meeting, 10, 0, 30)       // 10:00 – 10:30
-        createActivity(coding, 10, 30, 90)       // 10:30 – 12:00
+        createActivity(work, 8, 30, 90, "Emails")                   // 08:30 – 10:00
+        createActivity(meeting, 10, 0, 30, "Daily Standup")         // 10:00 – 10:30
+        createActivity(coding, 10, 30, 90, "Fixing bugs")           // 10:30 – 12:00
 
-        createActivity(lunch, 12, 0, 45)         // 12:00 – 12:45
-        createActivity(errands, 12, 45, 30)      // 12:45 – 13:15
-        createActivity(breakCat, 13, 15, 15)     // 13:15 – 13:30
+        createActivity(lunch, 12, 0, 45, "Food")                    // 12:00 – 12:45
+        createActivity(errands, 12, 45, 30, "Groceries")            // 12:45 – 13:15
+        createActivity(breakCat, 13, 15, 15, "Coffee refill")       // 13:15 – 13:30
 
-        createActivity(work, 13, 30, 60)         // 13:30 – 14:30
-        createActivity(coding, 14, 30, 90)       // 14:30 – 16:00
-        createActivity(meeting, 16, 0, 30)       // 16:00 – 16:30
-        createActivity(work, 16, 30, 60)         // 16:30 – 17:30
+        createActivity(work, 13, 30, 60, "Admin")                   // 13:30 – 14:30
+        createActivity(coding, 14, 30, 90, "New feature")           // 14:30 – 16:00
+        createActivity(meeting, 16, 0, 30, "Client sync")           // 16:00 – 16:30
+        createActivity(work, 16, 30, 60, "Wrap up")                 // 16:30 – 17:30
 
-        createActivity(fitness, 18, 0, 45)       // 18:00 – 18:45
-        createActivity(lunch, 19, 0, 45)         // 19:00 – 19:45
-        createActivity(leisure, 20, 0, 90)       // 20:00 – 21:30
-        createActivity(study, 21, 30, 45)        // 21:30 – 22:15
-        createActivity(meditation, 22, 30, 15)   // 22:30 – 22:45
-        createActivity(sleep, 23, 0, 60)         // 23:00 – 00:00
+        createActivity(fitness, 18, 0, 45, "Run")                   // 18:00 – 18:45
+        createActivity(lunch, 19, 0, 45, "Dinner")                  // 19:00 – 19:45
+        createActivity(leisure, 20, 0, 90, "Gaming")                // 20:00 – 21:30
+        createActivity(study, 21, 30, 45, "Reading")                // 21:30 – 22:15
+        createActivity(meditation, 22, 30, 15, "Headspace")         // 22:30 – 22:45
+        createActivity(sleep, 23, 0, 60, "Sleep")                   // 23:00 – 00:00
         
         do {
             try viewContext.save()
