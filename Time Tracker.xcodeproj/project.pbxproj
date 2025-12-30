@@ -7,11 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4A37E4342EFF956800B89C01 /* Transformers in Frameworks */ = {isa = PBXBuildFile; productRef = 4A37E4332EFF956800B89C01 /* Transformers */; };
 		4AC93BE22EF3B09B003D10ED /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6618DC2EEE520400BC53AB /* WidgetKit.framework */; };
 		4AC93BE32EF3B09B003D10ED /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6618DE2EEE520500BC53AB /* SwiftUI.framework */; };
 		4AC93BF22EF3B09C003D10ED /* TimeTrackerWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4AC93BE12EF3B09B003D10ED /* TimeTrackerWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4AC93BFD2EF3C559003D10ED /* TimeTrackerAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC93BFC2EF3C551003D10ED /* TimeTrackerAttributes.swift */; };
 		4AC93BFE2EF3C55F003D10ED /* TimeTrackerAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC93BFC2EF3C551003D10ED /* TimeTrackerAttributes.swift */; };
+		4AE452DD2EFF986900777486 /* Hub in Frameworks */ = {isa = PBXBuildFile; productRef = 4AE452DC2EFF986900777486 /* Hub */; };
+		4AE452DF2EFF986900777486 /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = 4AE452DE2EFF986900777486 /* Tokenizers */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +90,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4AE452DD2EFF986900777486 /* Hub in Frameworks */,
+				4A37E4342EFF956800B89C01 /* Transformers in Frameworks */,
+				4AE452DF2EFF986900777486 /* Tokenizers in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +159,9 @@
 			);
 			name = "Time Tracker";
 			packageProductDependencies = (
+				4A37E4332EFF956800B89C01 /* Transformers */,
+				4AE452DC2EFF986900777486 /* Hub */,
+				4AE452DE2EFF986900777486 /* Tokenizers */,
 			);
 			productName = "Time Tracker";
 			productReference = 4A3C48722EEB695400EA3BF9 /* Time Tracker.app */;
@@ -207,6 +216,9 @@
 			);
 			mainGroup = 4A3C48692EEB695400EA3BF9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4A37E4122EFF91A200B89C01 /* XCRemoteSwiftPackageReference "swift-transformers" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4A3C48732EEB695400EA3BF9 /* Products */;
 			projectDirPath = "";
@@ -545,6 +557,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4A37E4122EFF91A200B89C01 /* XCRemoteSwiftPackageReference "swift-transformers" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-transformers";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4A37E4332EFF956800B89C01 /* Transformers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4A37E4122EFF91A200B89C01 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Transformers;
+		};
+		4AE452DC2EFF986900777486 /* Hub */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4A37E4122EFF91A200B89C01 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Hub;
+		};
+		4AE452DE2EFF986900777486 /* Tokenizers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4A37E4122EFF91A200B89C01 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Tokenizers;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4A3C486A2EEB695400EA3BF9 /* Project object */;
 }

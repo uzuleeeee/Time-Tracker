@@ -14,6 +14,10 @@ struct Time_TrackerApp: App {
 
     init() {
         persistenceController.seedDefaultCategoriesIfNeeded()
+        
+        Task {
+            await Scorer.shared.setup()
+        }
     }
     
     var body: some Scene {

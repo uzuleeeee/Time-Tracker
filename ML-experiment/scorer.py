@@ -16,9 +16,6 @@ class Scorer:
         self.max_description_length = max_description_length
         self.k = k
 
-        self.query_prefix = ""
-        self.doc_prefix = ""
-
         self.label_to_description_vectors: Dict[str, np.ndarray] = {}
 
     def texts_to_vectors(self, texts: list[str]) -> np.ndarray:
@@ -37,18 +34,16 @@ class Scorer:
 
     def initialize_vectors(self):
         for label, descriptions in self.label_to_descriptions.items():
-            raw_texts = [label] + descriptions
-            prefixed_texts = [self.doc_prefix + t for t in raw_texts]
-
-            description_vectors = self.texts_to_vectors(prefixed_texts)  # (M + 1, D)
+            description_vectors = self.texts_to_vectors(
+                [label] + descriptions
+            )  # (M + 1, D)
 
             self.label_to_description_vectors[label] = description_vectors
 
     def predict(self, text):
         similarities = []
 
-        query_text = self.query_prefix + text
-        text_vector = self.texts_to_vectors([query_text])  # (1, D)
+        text_vector = self.texts_to_vectors([text])  # (1, D)
 
         for label, description_vectors in self.label_to_description_vectors.items():
             similarity_matrix = text_vector @ description_vectors.T  # (1, M + 1)
@@ -66,11 +61,9 @@ class Scorer:
     def update_descriptions(self, label, description):
         if label not in self.label_to_descriptions:
             self.label_to_descriptions[label] = []
-            self.label_to_description_vectors[label] = self.texts_to_vectors(
-                [self.doc_prefix + label]
-            )
+            self.label_to_description_vectors[label] = self.texts_to_vectors([label])
 
-        description_vector = self.texts_to_vectors([self.doc_prefix + description])
+        description_vector = self.texts_to_vectors([description])  # (1, D)
 
         if len(self.label_to_descriptions[label]) >= self.max_description_length:
             self.label_to_descriptions[label] = self.label_to_descriptions[label][1:]

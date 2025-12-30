@@ -18,7 +18,7 @@ struct ContentView: View {
     
     @FetchRequest(
         entity: Activity.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \Activity.startTime, ascending: false)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Activity.startTime, ascending: true)],
         animation: .default
     )
     private var activities: FetchedResults<Activity>
@@ -30,9 +30,9 @@ struct ContentView: View {
     )
     private var categories: FetchedResults<Category>
     
-    @State private var sheetHeight: CGFloat = 0
-    @State var presentSheet = false
+    @State var selectedCategory: Category? = nil
     @State private var selectedDate: Date = Date()
+    @State private var inputText: String = ""
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -46,84 +46,36 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                VStack(spacing: 0) {
-                    DateSelectionView(selectedDate: $selectedDate)
-                        .padding(.top, 10)
-                    
-                    Divider()
-                    
-                    DailyCalendarView(activities: Array(activities), selectedDate: selectedDate)
-                        .padding(.trailing)
-                }
-                .safeAreaInset(edge: .bottom) {
-                    Color.clear.frame(height: sheetHeight + 10)
-                }
-                
-                VStack {
-                    HStack(spacing: 0) {
-                        TimerView(uiModel: currentActivity?.uiModel ?? .empty)
-                        
-                        if let currentActivity {
-                            Button {
-                                viewModel.stopActivity(currentActivity)
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.title)
-                                    .foregroundStyle(.red)
-                                    .padding(.trailing)
-                            }
-                        }
+        VStack(spacing: 10) {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .trailing, spacing: 15) {
+                    ForEach(activities) { activity in
+                        ActivityView(uiModel: activity.uiModel)
                     }
-                    .id(currentActivity?.id)
-                    .transition(.opacity.animation(.default))
-                    
-                    Divider()
-                    
-                    Button("Start New Activity") {
-                        presentSheet.toggle()
-                    }
-                    .buttonStyle(LargeButtonStyle())
-                    .padding([.horizontal, .bottom], 16)
                 }
-                .background {
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 24,
-                        bottomLeadingRadius: 0,
-                        bottomTrailingRadius: 0,
-                        topTrailingRadius: 24
-                    )
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: -5)
-                }
-                .background(
-                    GeometryReader { geo -> Color in
-                        DispatchQueue.main.async {
-                            self.sheetHeight = geo.size.height
-                        }
-                        return Color.clear
-                    }
-                )
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .ignoresSafeArea(edges: .bottom)
-        }
-        .sheet(isPresented: $presentSheet) {
-            StartActivityView(
-                categories: Array(categories),
-                onStart: { category, description in
-                    viewModel.activityName = description
-                    viewModel.selectCategory(category, currentActivity: currentActivity)
+            
+            Spacer()
+            
+            CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+            
+            HStack {
+                TextField("What are you doing?", text: $inputText)
+                    .lineLimit(1)
+                    .textFieldStyle(.plain)
+                Button {
                     
-                    presentSheet = false
-                },
-                onCancel: {
-                    presentSheet = false
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
                 }
-            )
-            .presentationDragIndicator(.visible)
-            .presentationBackground(Color(.systemBackground))
+            }
+            .frame(maxWidth: .infinity)
+            .bubbleStyle()
         }
+        .padding()
     }
 }
 

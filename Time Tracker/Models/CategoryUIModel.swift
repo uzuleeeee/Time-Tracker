@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CategoryUIModel: Identifiable, Equatable {
+struct CategoryUIModel: Identifiable, Hashable {
     let id: UUID
     let name: String
     let iconName: String
