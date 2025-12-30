@@ -5,3 +5,10 @@
 *.xcuserstate
 *.xcuserdata/
 *.breakable.html
+ML-experiment/__pycache__/categories.cpython-310.pyc
+ML-experiment/__pycache__/scorer.cpython-310.pyc
+ML-experiment/categories.py
+ML-experiment/environment.yml
+ML-experiment/scorer.py
+ML-experiment/test_cases.py
+ML-experiment/test_model.ipynb
