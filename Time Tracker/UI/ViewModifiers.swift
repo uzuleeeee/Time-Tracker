@@ -31,6 +31,13 @@ enum BubbleSize {
         case .regular: return 16
         }
     }
+    
+    var cornerRadius: CGFloat {
+        switch self {
+        case .small: return 15
+        case .regular: return 20
+        }
+    }
 }
 
 struct BubbleModifier: ViewModifier {
@@ -47,11 +54,11 @@ struct BubbleModifier: ViewModifier {
             .padding(.vertical, size.verticalPadding)
             .padding(.horizontal, size.horizontalPadding)
             .background(
-                Capsule()
+                RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
                     .fill(Color(.secondarySystemBackground))
             )
             .overlay(
-                Capsule()
+                RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
                     .strokeBorder(
                         isSelected ? selectionColor : .clear,
                         lineWidth: isSelected ? 2 : 0
