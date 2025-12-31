@@ -10,19 +10,56 @@ import SwiftUI
 struct ActivityView: View {
     let uiModel: ActivityUIModel
     
+    // How tall should 1 hour be?
+    var hourHeight: CGFloat = 80
+    // What is the smallest a bubble can be? (To fit the text)
+    var minHeight: CGFloat = 60
+    
+    // State to track measurements for the sticky effect
+    @State private var contentHeight: CGFloat = 0
+    @State private var stickyOffset: CGFloat = 0
+    
     var body: some View {
-        VStack {
-            HStack(alignment: .bottom) {
-                Spacer()
-                
+        let duration: TimeInterval = {
+            if let end = uiModel.endTime, let start = uiModel.startTime {
+                return end.timeIntervalSince(start)
+            }
+            if let start = uiModel.startTime {
+                return Date().timeIntervalSince(start)
+            }
+            return 0
+        }()
+        
+        let calculatedHeight = (duration / 3600.0) * hourHeight
+        let displayHeight = max(calculatedHeight, minHeight)
+        
+        HStack {
+            VStack(alignment: .trailing) {
                 if let startTime = uiModel.startTime {
                     Text(startTime, format: .dateTime.hour().minute())
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, 4)
+                        .offset(y: stickyOffset)
                 }
                 
-                Group {
+                Spacer()
+                
+                if let endTime = uiModel.endTime {
+                    Text(endTime, format: .dateTime.hour().minute())
+                } else {
+                    HStack(spacing: 4) {
+                        Text("Now")
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 4))
+                            .foregroundStyle(.secondary)
+                        Text(Date(), format: .dateTime.hour().minute())
+                    }
+                }
+            }
+            .frame(height: displayHeight)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            
+            VStack {
+                HStack {
                     if let description = uiModel.description {
                         Text(description)
                             .font(.system(.body, design: .rounded))
@@ -32,41 +69,60 @@ struct ActivityView: View {
                             .font(.system(.body, design: .rounded))
                             .fontWeight(.medium)
                     }
-                }
-                .bubbleStyle()
-                
-                if let startTime = uiModel.startTime {
-                    if uiModel.endTime == nil {
-                        HStack {
-                            
-                            
+                    
+                    Image(systemName: "circle.fill")
+                        .font(.system(size: 4))
+                        .foregroundStyle(.secondary)
+                    
+                    if let startTime = uiModel.startTime {
+                        if uiModel.endTime == nil {
                             HStack {
                                 Text(startTime, style: .timer)
-                                
-                                Button {
-                                    
-                                } label: {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.primary)
-                                }
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.primary)
                             }
-                            .bubbleStyle()
-                        }
-                    } else if let endTime = uiModel.endTime {
-                        let duration = endTime.timeIntervalSince(startTime)
-                        
-                        HStack(alignment: .bottom) {
+                        } else if let endTime = uiModel.endTime {
+                            let duration = endTime.timeIntervalSince(startTime)
                             Text(TimeFormatter.format(duration: duration))
-                                .bubbleStyle()
-                            
-                            
                         }
                     }
                 }
+                .lineLimit(1)
+                // Measure the text content height
+                .background(
+                    GeometryReader { contentGeo in
+                        Color.clear.onAppear {
+                            contentHeight = contentGeo.size.height
+                        }
+                    }
+                )
             }
-            
-            
+            // Apply the sticky offset to the text content
+            .offset(y: stickyOffset)
+            // Force the bubble to be the calculated time-height
+            .frame(height: displayHeight, alignment: .top)
+            // Use Background GeometryReader to track scroll position
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear {
+                            updateOffset(geo: geo, displayHeight: displayHeight)
+                        }
+                        .onChange(of: geo.frame(in: .named("scroll")).minY) { _ in
+                            updateOffset(geo: geo, displayHeight: displayHeight)
+                        }
+                }
+            )
+            .bubbleStyle()
         }
+    }
+    
+    // Helper to calculate the sticky logic
+    private func updateOffset(geo: GeometryProxy, displayHeight: CGFloat) {
+        let minY = geo.frame(in: .named("scroll")).minY
+        let availableSpace = displayHeight - contentHeight - 8
+        // Clamp the offset
+        stickyOffset = max(0, min(-minY, availableSpace))
     }
 }
 
@@ -97,6 +153,7 @@ struct TimeFormatter {
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
+        .coordinateSpace(name: "scroll")
         .padding()
     }
 }
