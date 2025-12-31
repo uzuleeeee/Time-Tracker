@@ -43,10 +43,20 @@ enum BubbleSize {
 struct BubbleModifier: ViewModifier {
     var size: BubbleSize = .regular
     var isSelected: Bool = false
+    var roundTopRight: Bool = true
+    var roundBottomRight: Bool = true
     
     var selectionColor: Color = Color.primary.opacity(0.5)
     
     func body(content: Content) -> some View {
+        let shape = UnevenRoundedRectangle(
+            topLeadingRadius: size.cornerRadius,
+            bottomLeadingRadius: size.cornerRadius,
+            bottomTrailingRadius: roundBottomRight ? size.cornerRadius : 0,
+            topTrailingRadius: roundTopRight ? size.cornerRadius : 0,
+            style: .continuous
+        )
+        
         content
             .font(size.font)
             .fontWeight(.medium)
@@ -54,11 +64,11 @@ struct BubbleModifier: ViewModifier {
             .padding(.vertical, size.verticalPadding)
             .padding(.horizontal, size.horizontalPadding)
             .background(
-                RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
+                shape
                     .fill(Color(.secondarySystemBackground))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: size.cornerRadius, style: .continuous)
+                shape
                     .strokeBorder(
                         isSelected ? selectionColor : .clear,
                         lineWidth: isSelected ? 2 : 0
@@ -68,7 +78,19 @@ struct BubbleModifier: ViewModifier {
 }
 
 extension View {
-    func bubbleStyle(size: BubbleSize = .regular, isSelected: Bool = false) -> some View {
-        self.modifier(BubbleModifier(size: size, isSelected: isSelected))
+    func bubbleStyle(
+        size: BubbleSize = .regular,
+        isSelected: Bool = false,
+        roundTopRight: Bool = true,
+        roundBottomRight: Bool = true
+    ) -> some View {
+        self.modifier(
+            BubbleModifier(
+                size: size,
+                isSelected: isSelected,
+                roundTopRight: roundTopRight,
+                roundBottomRight: roundBottomRight
+            )
+        )
     }
 }
