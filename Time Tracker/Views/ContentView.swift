@@ -46,15 +46,19 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .trailing, spacing: 15) {
-                    ForEach(activities) { activity in
-                        ActivityView(uiModel: activity.uiModel)
+                VStack(alignment: .trailing, spacing: 3) {
+                    ForEach(viewModel.processedActivityUIModels) { uiModel in
+                        ActivityView(uiModel: uiModel)
+                            .padding(.top, uiModel.topConnected ? 0 : 20)
+                            .padding(.bottom, uiModel.bottomConnected ? 0 : 20)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
+            
+//            DailyCalendarView(activities: Array(activities))
             
             Spacer()
             
@@ -76,6 +80,15 @@ struct ContentView: View {
             .bubbleStyle()
         }
         .padding()
+        .onAppear {
+            viewModel.updateModels(from: Array(activities))
+        }
+        .onChange(of: activities.map { $0.startTime }) { _ in
+            viewModel.updateModels(from: Array(activities))
+        }
+        .onChange(of: activities.map { $0.endTime }) { _ in
+            viewModel.updateModels(from: Array(activities))
+        }
     }
 }
 

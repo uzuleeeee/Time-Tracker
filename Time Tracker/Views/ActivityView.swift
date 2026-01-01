@@ -12,8 +12,6 @@ struct ActivityView: View {
     
     // How tall should 1 hour be?
     var hourHeight: CGFloat = 80
-    // What is the smallest a bubble can be? (To fit the text)
-    var minHeight: CGFloat = 60
     
     // State to track measurements for the sticky effect
     @State private var contentHeight: CGFloat = 0
@@ -31,7 +29,7 @@ struct ActivityView: View {
         }()
         
         let calculatedHeight = (duration / 3600.0) * hourHeight
-        let displayHeight = max(calculatedHeight, minHeight)
+        let displayHeight = max(calculatedHeight, contentHeight)
         
         HStack {
             VStack(alignment: .trailing) {
@@ -42,15 +40,17 @@ struct ActivityView: View {
                 
                 Spacer()
                 
-                if let endTime = uiModel.endTime {
-                    Text(endTime, format: .dateTime.hour().minute())
-                } else {
-                    HStack(spacing: 4) {
-                        Text("Now")
-                        Image(systemName: "circle.fill")
-                            .font(.system(size: 4))
-                            .foregroundStyle(.secondary)
-                        Text(Date(), format: .dateTime.hour().minute())
+                if !uiModel.bottomConnected {
+                    if let endTime = uiModel.endTime {
+                        Text(endTime, format: .dateTime.hour().minute())
+                    } else {
+                        HStack(spacing: 4) {
+                            Text("Now")
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 4))
+                                .foregroundStyle(.secondary)
+                            Text(Date(), format: .dateTime.hour().minute())
+                        }
                     }
                 }
             }
@@ -113,7 +113,10 @@ struct ActivityView: View {
                         }
                 }
             )
-            .bubbleStyle()
+            .bubbleStyle(
+                roundTopRight: !uiModel.topConnected,
+                roundBottomRight: !uiModel.bottomConnected
+            )
         }
     }
     

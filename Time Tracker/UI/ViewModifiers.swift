@@ -52,8 +52,8 @@ struct BubbleModifier: ViewModifier {
         let shape = UnevenRoundedRectangle(
             topLeadingRadius: size.cornerRadius,
             bottomLeadingRadius: size.cornerRadius,
-            bottomTrailingRadius: roundBottomRight ? size.cornerRadius : 0,
-            topTrailingRadius: roundTopRight ? size.cornerRadius : 0,
+            bottomTrailingRadius: roundBottomRight ? size.cornerRadius : 5,
+            topTrailingRadius: roundTopRight ? size.cornerRadius : 5,
             style: .continuous
         )
         

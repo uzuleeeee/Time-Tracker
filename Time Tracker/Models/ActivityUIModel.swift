@@ -15,6 +15,9 @@ struct ActivityUIModel: Identifiable, Equatable {
     let endTime: Date?
     let description: String?
     
+    var topConnected: Bool = false
+    var bottomConnected: Bool = false
+    
     // Default placeholder when activity data is unavailable
     static let empty = ActivityUIModel(
         id: UUID(),

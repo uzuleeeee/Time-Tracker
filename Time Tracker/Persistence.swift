@@ -67,7 +67,7 @@ struct PersistenceController {
 
         createActivity(work, 8, 30, 90, "Emails")
         createActivity(meeting, 10, 0, 30, nil)
-        createActivity(coding, 10, 30, 90, "Fixing bugs")
+        createActivity(coding, 10, 30, 5, "Fixing bugs")
 
         createActivity(lunch, 12, 0, 45, "Food")
         createActivity(errands, 12, 45, 30, "Groceries")

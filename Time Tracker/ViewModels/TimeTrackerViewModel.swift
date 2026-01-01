@@ -21,6 +21,7 @@ class TimeTrackerViewModel: ObservableObject {
     // UI state
     @Published var selectedCategory: Category?
     @Published var activityName: String = ""
+    @Published var processedActivityUIModels: [ActivityUIModel] = []
     
     // Live activity
     private var currentLiveActivity: ActivityKit.Activity<TimeTrackerWidgetAttributes>?
@@ -83,6 +84,29 @@ class TimeTrackerViewModel: ObservableObject {
         }
     }
 
+    func updateModels(from activities: [Activity]) {
+        let sortedActivities = activities.sorted { $0.startTime ?? Date.distantPast < $1.startTime ?? Date.distantPast }
+        
+        var processedUIModels: [ActivityUIModel] = []
+        
+        for index in sortedActivities.indices {
+            let currentActivity = sortedActivities[index]
+            var currentUIModel = currentActivity.uiModel
+            
+            if index > 0, areConnected(prev: sortedActivities[index - 1], curr: currentActivity) {
+                currentUIModel.topConnected = true
+            }
+            
+            if index < sortedActivities.count - 1, areConnected(prev: currentActivity, curr: sortedActivities[index + 1]) {
+                currentUIModel.bottomConnected = true
+            }
+            
+            processedUIModels.append(currentUIModel)
+        }
+        
+        self.processedActivityUIModels = processedUIModels
+    }
+    
     // Internal helpers
     
     private func saveContext() {
@@ -94,6 +118,11 @@ class TimeTrackerViewModel: ObservableObject {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
+    }
+    
+    private func areConnected(prev: Activity, curr: Activity) -> Bool {
+        guard let prevEnd = prev.endTime, let currStart = curr.startTime else { return false }
+        return abs(currStart.timeIntervalSince(prevEnd)) < 60
     }
     
     // Live Activity
