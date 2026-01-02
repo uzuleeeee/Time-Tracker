@@ -47,20 +47,26 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .trailing, spacing: 3) {
-                    ForEach(viewModel.processedActivityUIModels) { uiModel in
-                        ActivityView(uiModel: uiModel)
-                            .padding(.top, uiModel.topConnected ? 0 : 20)
-                            .padding(.bottom, uiModel.bottomConnected ? 0 : 20)
+            GeometryReader { scrollProxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .trailing, spacing: 3) {
+                        ForEach(viewModel.timelineItems) { item in
+                            switch item {
+                            case .activity(let uiModel):
+                                ActivityView(uiModel: uiModel)
+                                //                                .padding(.top, uiModel.topConnected ? 0 : 20)
+                                //                                .padding(.bottom, uiModel.bottomConnected ? 0 : 20)
+                            case .gap(let uiModel):
+                                GapView(uiModel: uiModel, visibleHeight: scrollProxy.size.height)
+                            }
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                .frame(maxWidth: .infinity, alignment: .trailing)
             }
+            .coordinateSpace(name: "scroll")
             
 //            DailyCalendarView(activities: Array(activities))
-            
-            Spacer()
             
             CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
             
