@@ -42,12 +42,12 @@ struct ActivityListView: View {
             }
             .coordinateSpace(name: "scroll")
             .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
-                let isFooterVisible = true
+                let isActivityBelowScreen = (frame?.minY ?? 0) > visibleHeight
                 
                 VStack {
                     Spacer()
                     
-                    if isFooterVisible, let currentUIModel = currentActivity?.uiModel {
+                    if isActivityBelowScreen, let currentUIModel = currentActivity?.uiModel {
                         HStack {
                             Spacer()
                             
@@ -62,7 +62,7 @@ struct ActivityListView: View {
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                 }
-                .animation(.easeInOut, value: isFooterVisible)
+                .animation(.easeInOut, value: isActivityBelowScreen)
             }
             .onAppear {
                 scrollToBottom(proxy: proxy, scrollWithAnimation: false)
