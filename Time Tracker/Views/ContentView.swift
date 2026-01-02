@@ -74,22 +74,27 @@ struct ContentView: View {
             
 //            DailyCalendarView(activities: Array(activities))
             
-            CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
-            
-            HStack {
-                TextField("What are you doing?", text: $inputText)
-                    .lineLimit(1)
-                    .textFieldStyle(.plain)
-                Button {
-                    
-                } label: {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+            VStack {
+                Divider()
+                
+                CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+                
+                HStack {
+                    TextField("What are you doing?", text: $inputText)
+                        .lineLimit(1)
+                        .textFieldStyle(.plain)
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+                    }
                 }
+                .frame(maxWidth: .infinity)
+                .bubbleStyle()
             }
-            .frame(maxWidth: .infinity)
-            .bubbleStyle()
+            .background(Color(.systemBackground))
         }
         .padding()
         .onAppear {
