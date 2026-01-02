@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ActivityView: View {
     let uiModel: ActivityUIModel
+    var isActive: Bool = false
     
     // How tall should 1 hour be?
     var hourHeight: CGFloat = 80
@@ -86,6 +87,7 @@ struct ActivityView: View {
                 }
             )
             .bubbleStyle(
+                isSelected: isActive,
                 roundTopRight: !uiModel.topConnected,
                 roundBottomRight: !uiModel.bottomConnected
             )

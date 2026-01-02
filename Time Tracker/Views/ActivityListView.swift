@@ -19,7 +19,9 @@ struct ActivityListView: View {
                     ForEach(viewModel.timelineItems) { item in
                         switch item {
                         case .activity(let uiModel):
-                            ActivityView(uiModel: uiModel)
+                            let isActive = uiModel.endTime == nil
+                            
+                            ActivityView(uiModel: uiModel, isActive: isActive)
                                 .background(
                                     GeometryReader { geo in
                                         if uiModel.endTime == nil {
@@ -40,7 +42,7 @@ struct ActivityListView: View {
             }
             .coordinateSpace(name: "scroll")
             .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
-                let isFooterVisible = (frame?.minY ?? 0) > visibleHeight
+                let isFooterVisible = true
                 
                 VStack {
                     Spacer()
