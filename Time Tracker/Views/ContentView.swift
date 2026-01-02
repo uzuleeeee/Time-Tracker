@@ -51,25 +51,6 @@ struct ContentView: View {
                 let visibleHeight = scrollProxy.size.height
                 
                 ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight)
-                    .coordinateSpace(name: "scroll")
-                    .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
-                        let isFooterVisible = (frame?.minY ?? 0) > visibleHeight
-                        
-                        VStack {
-                            Spacer()
-                            
-                            if isFooterVisible, let liveModel = getCurrentActivityModel() {
-                                HStack {
-                                    Spacer()
-                                    
-                                    ActivityContents(uiModel: liveModel)
-                                        .bubbleStyle(isSelected: true)
-                                }
-                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-                            }
-                        }
-                        .animation(.easeInOut, value: isFooterVisible)
-                    }
             }
             
 //            DailyCalendarView(activities: Array(activities))
@@ -107,23 +88,6 @@ struct ContentView: View {
             viewModel.updateModels(from: Array(activities))
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
-    }
-    
-    private func getCurrentActivityModel() -> ActivityUIModel? {
-        if let currentItem = viewModel.timelineItems.first(where: {
-            if case .activity(let m) = $0, m.endTime == nil { return true }
-            return false
-        }), case .activity(let uiModel) = currentItem {
-            return uiModel
-        }
-        return nil
-    }
-}
-
-struct CurrentActivityPositionKey: PreferenceKey {
-    static var defaultValue: CGRect? = nil
-    static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
-        value = value ?? nextValue()
     }
 }
 
