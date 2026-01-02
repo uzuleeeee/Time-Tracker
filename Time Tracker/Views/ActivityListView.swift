@@ -33,7 +33,7 @@ struct ActivityListView: View {
                     
                     Color.clear
                         .frame(height: 1)
-                        .id("BOTTOM")
+                        .id("Bottom")
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
@@ -48,8 +48,13 @@ struct ActivityListView: View {
                         HStack {
                             Spacer()
                             
-                            ActivityContents(uiModel: liveModel)
-                                .bubbleStyle(isSelected: true)
+                            Button {
+                                scrollToBottom(proxy: proxy, scrollWithAnimation: true)
+                            } label: {
+                                ActivityContents(uiModel: liveModel)
+                                    .bubbleStyle(isSelected: true)
+                            }
+                            .buttonStyle(.plain)
                         }
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
@@ -57,9 +62,7 @@ struct ActivityListView: View {
                 .animation(.easeInOut, value: isFooterVisible)
             }
             .onAppear {
-                DispatchQueue.main.async {
-                    proxy.scrollTo("BOTTOM", anchor: .bottom)
-                }
+                scrollToBottom(proxy: proxy, scrollWithAnimation: false)
             }
         }
     }
@@ -72,6 +75,22 @@ struct ActivityListView: View {
             return uiModel
         }
         return nil
+    }
+    
+    private func scrollToBottom(proxy: ScrollViewProxy, scrollWithAnimation: Bool) {
+        if scrollWithAnimation {
+            proxy.scrollTo("Bottom", anchor: .bottom)
+            
+            DispatchQueue.main.async {
+                withAnimation {
+                    proxy.scrollTo("Bottom", anchor: .bottom)
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                proxy.scrollTo("Bottom", anchor: .bottom)
+            }
+        }
     }
 }
 
