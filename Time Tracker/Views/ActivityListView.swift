@@ -10,6 +10,7 @@ import SwiftUI
 struct ActivityListView: View {
     @ObservedObject var viewModel: TimeTrackerViewModel
     let visibleHeight: CGFloat
+    let currentActivity: Activity?
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -44,14 +45,14 @@ struct ActivityListView: View {
                 VStack {
                     Spacer()
                     
-                    if isFooterVisible, let liveModel = getCurrentActivityModel() {
+                    if isFooterVisible, let currentUIModel = currentActivity?.uiModel {
                         HStack {
                             Spacer()
                             
                             Button {
                                 scrollToBottom(proxy: proxy, scrollWithAnimation: true)
                             } label: {
-                                ActivityContents(uiModel: liveModel)
+                                ActivityContents(uiModel: currentUIModel)
                                     .bubbleStyle(isSelected: true)
                             }
                             .buttonStyle(.plain)
@@ -65,16 +66,6 @@ struct ActivityListView: View {
                 scrollToBottom(proxy: proxy, scrollWithAnimation: false)
             }
         }
-    }
-    
-    private func getCurrentActivityModel() -> ActivityUIModel? {
-        if let currentItem = viewModel.timelineItems.first(where: {
-            if case .activity(let m) = $0, m.endTime == nil { return true }
-            return false
-        }), case .activity(let uiModel) = currentItem {
-            return uiModel
-        }
-        return nil
     }
     
     private func scrollToBottom(proxy: ScrollViewProxy, scrollWithAnimation: Bool) {
