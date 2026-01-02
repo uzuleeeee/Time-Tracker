@@ -34,8 +34,6 @@ struct ContentView: View {
     @State private var selectedDate: Date = Date()
     @State private var inputText: String = ""
     
-    @State private var currentActivityFrame: CGRect? = nil
-    
     // Computed property to find running activity
     var currentActivity: Activity? {
         activities.first(where: { $0.endTime == nil })
@@ -52,41 +50,27 @@ struct ContentView: View {
             GeometryReader { scrollProxy in
                 let visibleHeight = scrollProxy.size.height
                 
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .trailing, spacing: 3) {
-                        ForEach(viewModel.timelineItems) { item in
-                            switch item {
-                            case .activity(let uiModel):
-                                ActivityView(uiModel: uiModel)
-                                    .background(
-                                        GeometryReader { geo in
-                                            if uiModel.endTime == nil {
-                                                Color.clear.preference(key: CurrentActivityPositionKey.self, value: geo.frame(in: .named("scroll")))
-                                            }
-                                        }
-                                    )
-                            case .gap(let uiModel):
-                                GapView(uiModel: uiModel, visibleHeight: visibleHeight)
+                ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight)
+                    .coordinateSpace(name: "scroll")
+                    .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
+                        let isFooterVisible = (frame?.minY ?? 0) > visibleHeight
+                        
+                        VStack {
+                            Spacer()
+                            
+                            if isFooterVisible, let liveModel = getCurrentActivityModel() {
+                                HStack {
+                                    Spacer()
+                                    
+                                    ActivityContents(uiModel: liveModel)
+                                        .bubbleStyle(isSelected: true)
+                                }
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
                             }
                         }
+                        .animation(.easeInOut, value: isFooterVisible)
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                .onPreferenceChange(CurrentActivityPositionKey.self) { frame in
-                    self.currentActivityFrame = frame
-                }
-                .overlay(alignment: .bottom) {
-                    if shouldShowStickyFooter(visibleHeight: visibleHeight) {
-                        if let currentItem = viewModel.timelineItems.first(where: {
-                            if case .activity(let m) = $0, m.endTime == nil { return true }
-                            return false
-                        }), case .activity(let uiModel) = currentItem {
-                            Text("Hi")
-                        }
-                    }
-                }
             }
-            .coordinateSpace(name: "scroll")
             
 //            DailyCalendarView(activities: Array(activities))
             
@@ -117,12 +101,17 @@ struct ContentView: View {
         .onChange(of: activities.map { $0.endTime }) { _ in
             viewModel.updateModels(from: Array(activities))
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: currentActivityFrame)
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
     }
     
-    private func shouldShowStickyFooter(visibleHeight: CGFloat) -> Bool {
-        guard let frame = currentActivityFrame else { return false }
-        return frame.minY > visibleHeight
+    private func getCurrentActivityModel() -> ActivityUIModel? {
+        if let currentItem = viewModel.timelineItems.first(where: {
+            if case .activity(let m) = $0, m.endTime == nil { return true }
+            return false
+        }), case .activity(let uiModel) = currentItem {
+            return uiModel
+        }
+        return nil
     }
 }
 
