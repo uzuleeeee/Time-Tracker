@@ -12,44 +12,55 @@ struct ActivityListView: View {
     let visibleHeight: CGFloat
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .trailing, spacing: 3) {
-                ForEach(viewModel.timelineItems) { item in
-                    switch item {
-                    case .activity(let uiModel):
-                        ActivityView(uiModel: uiModel)
-                            .background(
-                                GeometryReader { geo in
-                                    if uiModel.endTime == nil {
-                                        Color.clear.preference(key: CurrentActivityPositionKey.self, value: geo.frame(in: .named("scroll")))
+        ScrollViewReader { proxy in
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .trailing, spacing: 3) {
+                    ForEach(viewModel.timelineItems) { item in
+                        switch item {
+                        case .activity(let uiModel):
+                            ActivityView(uiModel: uiModel)
+                                .background(
+                                    GeometryReader { geo in
+                                        if uiModel.endTime == nil {
+                                            Color.clear.preference(key: CurrentActivityPositionKey.self, value: geo.frame(in: .named("scroll")))
+                                        }
                                     }
-                                }
-                            )
-                    case .gap(let uiModel):
-                        GapView(uiModel: uiModel, visibleHeight: visibleHeight)
+                                )
+                        case .gap(let uiModel):
+                            GapView(uiModel: uiModel, visibleHeight: visibleHeight)
+                        }
                     }
+                    
+                    Color.clear
+                        .frame(height: 1)
+                        .id("BOTTOM")
                 }
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-        }
-        .coordinateSpace(name: "scroll")
-        .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
-            let isFooterVisible = (frame?.minY ?? 0) > visibleHeight
-            
-            VStack {
-                Spacer()
+            .coordinateSpace(name: "scroll")
+            .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
+                let isFooterVisible = (frame?.minY ?? 0) > visibleHeight
                 
-                if isFooterVisible, let liveModel = getCurrentActivityModel() {
-                    HStack {
-                        Spacer()
-                        
-                        ActivityContents(uiModel: liveModel)
-                            .bubbleStyle(isSelected: true)
+                VStack {
+                    Spacer()
+                    
+                    if isFooterVisible, let liveModel = getCurrentActivityModel() {
+                        HStack {
+                            Spacer()
+                            
+                            ActivityContents(uiModel: liveModel)
+                                .bubbleStyle(isSelected: true)
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                }
+                .animation(.easeInOut, value: isFooterVisible)
+            }
+            .onAppear {
+                DispatchQueue.main.async {
+                    proxy.scrollTo("BOTTOM", anchor: .bottom)
                 }
             }
-            .animation(.easeInOut, value: isFooterVisible)
         }
     }
     
