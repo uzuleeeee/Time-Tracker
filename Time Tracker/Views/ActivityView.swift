@@ -78,8 +78,12 @@ struct ActivityView: View {
                         if uiModel.endTime == nil {
                             HStack {
                                 Text(startTime, style: .timer)
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.primary)
+                                Button {
+                                    
+                                } label: {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.primary)
+                                }
                             }
                         } else if let endTime = uiModel.endTime {
                             let duration = endTime.timeIntervalSince(startTime)

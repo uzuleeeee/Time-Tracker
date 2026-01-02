@@ -21,7 +21,7 @@ class TimeTrackerViewModel: ObservableObject {
     // UI state
     @Published var selectedCategory: Category?
     @Published var activityName: String = ""
-    @Published var processedActivityUIModels: [ActivityUIModel] = []
+    @Published var timelineItems: [TimelineItem] = []
     
     // Live activity
     private var currentLiveActivity: ActivityKit.Activity<TimeTrackerWidgetAttributes>?
@@ -87,24 +87,34 @@ class TimeTrackerViewModel: ObservableObject {
     func updateModels(from activities: [Activity]) {
         let sortedActivities = activities.sorted { $0.startTime ?? Date.distantPast < $1.startTime ?? Date.distantPast }
         
-        var processedUIModels: [ActivityUIModel] = []
+        var timelineItems: [TimelineItem] = []
         
         for index in sortedActivities.indices {
             let currentActivity = sortedActivities[index]
             var currentUIModel = currentActivity.uiModel
             
-            if index > 0, areConnected(prev: sortedActivities[index - 1], curr: currentActivity) {
-                currentUIModel.topConnected = true
+            if index > 0 {
+                let prevActivity = sortedActivities[index - 1]
+                if areConnected(prev: prevActivity, curr: currentActivity) {
+                    currentUIModel.topConnected = true
+                } else {
+                    if let prevEnd = prevActivity.endTime, let currStart = currentActivity.startTime {
+                        let gapDuration = currStart.timeIntervalSince(prevEnd)
+                        if gapDuration > 60 {
+                            timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration)))
+                        }
+                    }
+                }
             }
             
             if index < sortedActivities.count - 1, areConnected(prev: currentActivity, curr: sortedActivities[index + 1]) {
                 currentUIModel.bottomConnected = true
             }
             
-            processedUIModels.append(currentUIModel)
+            timelineItems.append(.activity(currentUIModel))
         }
         
-        self.processedActivityUIModels = processedUIModels
+        self.timelineItems = timelineItems
     }
     
     // Internal helpers
