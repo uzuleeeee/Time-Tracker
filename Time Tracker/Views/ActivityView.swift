@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ActivityView: View {
     let uiModel: ActivityUIModel
+    var isActive: Bool = false
     
     // How tall should 1 hour be?
     var hourHeight: CGFloat = 80
@@ -59,39 +60,7 @@ struct ActivityView: View {
             .foregroundStyle(.secondary)
             
             VStack {
-                HStack {
-                    if let description = uiModel.description {
-                        Text(description)
-                            .font(.system(.body, design: .rounded))
-                            .fontWeight(.medium)
-                    } else {
-                        Text(uiModel.category.name)
-                            .font(.system(.body, design: .rounded))
-                            .fontWeight(.medium)
-                    }
-                    
-                    Image(systemName: "circle.fill")
-                        .font(.system(size: 4))
-                        .foregroundStyle(.secondary)
-                    
-                    if let startTime = uiModel.startTime {
-                        if uiModel.endTime == nil {
-                            HStack {
-                                Text(startTime, style: .timer)
-                                Button {
-                                    
-                                } label: {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.primary)
-                                }
-                            }
-                        } else if let endTime = uiModel.endTime {
-                            let duration = endTime.timeIntervalSince(startTime)
-                            Text(TimeFormatter.format(duration: duration))
-                        }
-                    }
-                }
-                .lineLimit(1)
+                ActivityContents(uiModel: uiModel)
                 // Measure the text content height
                 .background(
                     GeometryReader { contentGeo in
@@ -118,6 +87,7 @@ struct ActivityView: View {
                 }
             )
             .bubbleStyle(
+                isSelected: isActive,
                 roundTopRight: !uiModel.topConnected,
                 roundBottomRight: !uiModel.bottomConnected
             )

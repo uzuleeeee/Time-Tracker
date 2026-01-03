@@ -48,42 +48,35 @@ struct ContentView: View {
     var body: some View {
         VStack {
             GeometryReader { scrollProxy in
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .trailing, spacing: 3) {
-                        ForEach(viewModel.timelineItems) { item in
-                            switch item {
-                            case .activity(let uiModel):
-                                ActivityView(uiModel: uiModel)
-                                //                                .padding(.top, uiModel.topConnected ? 0 : 20)
-                                //                                .padding(.bottom, uiModel.bottomConnected ? 0 : 20)
-                            case .gap(let uiModel):
-                                GapView(uiModel: uiModel, visibleHeight: scrollProxy.size.height)
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                }
+                let visibleHeight = scrollProxy.size.height
+                
+                ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity)
             }
-            .coordinateSpace(name: "scroll")
             
 //            DailyCalendarView(activities: Array(activities))
             
-            CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
-            
-            HStack {
-                TextField("What are you doing?", text: $inputText)
-                    .lineLimit(1)
-                    .textFieldStyle(.plain)
-                Button {
-                    
-                } label: {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+            VStack {
+                Divider()
+                
+                CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+                
+                HStack {
+                    TextField("What are you doing?", text: $inputText)
+                        .lineLimit(1)
+                        .textFieldStyle(.plain)
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+                    }
+                    .buttonStyle(.bouncy)
                 }
+                .frame(maxWidth: .infinity)
+                .bubbleStyle()
             }
-            .frame(maxWidth: .infinity)
-            .bubbleStyle()
+            .background(Color(.systemBackground))
         }
         .padding()
         .onAppear {
@@ -95,6 +88,7 @@ struct ContentView: View {
         .onChange(of: activities.map { $0.endTime }) { _ in
             viewModel.updateModels(from: Array(activities))
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
     }
 }
 
