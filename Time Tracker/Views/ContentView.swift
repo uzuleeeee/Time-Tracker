@@ -46,49 +46,69 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack {
-            GeometryReader { scrollProxy in
-                let visibleHeight = scrollProxy.size.height
-                
-                ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity)
-            }
-            
-//            DailyCalendarView(activities: Array(activities))
-            
-            VStack {
-                Divider()
-                
-                CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
-                
+        NavigationStack {
+            VStack(spacing: 0) {
                 HStack {
-                    TextField("What are you doing?", text: $inputText)
-                        .lineLimit(1)
-                        .textFieldStyle(.plain)
+                    Spacer()
+
                     Button {
-                        
+                        // Action
                     } label: {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+                        Image(systemName: "plus")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                            .padding(8)
+//                            .background(Color(.systemGray6))
+                            .clipShape(Circle())
                     }
                     .buttonStyle(.bouncy)
                 }
-                .frame(maxWidth: .infinity)
-                .bubbleStyle()
+                .background(Color(.systemBackground))
+                
+                GeometryReader { scrollProxy in
+                    let visibleHeight = scrollProxy.size.height
+                    
+                    ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity)
+                }
+                
+                //            DailyCalendarView(activities: Array(activities))
+                
+                VStack {
+                    Divider()
+                    
+                    CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+                    
+                    HStack {
+                        TextField("What are you doing?", text: $inputText)
+                            .lineLimit(1)
+                            .textFieldStyle(.plain)
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+                        }
+                        .buttonStyle(.bouncy)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .bubbleStyle()
+                }
+                .background(Color(.systemBackground))
             }
-            .background(Color(.systemBackground))
+            .padding(.horizontal)
+            .onAppear {
+                viewModel.updateModels(from: Array(activities))
+            }
+            .onChange(of: activities.map { $0.startTime }) { _ in
+                viewModel.updateModels(from: Array(activities))
+            }
+            .onChange(of: activities.map { $0.endTime }) { _ in
+                viewModel.updateModels(from: Array(activities))
+            }
+            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
         }
-        .padding()
-        .onAppear {
-            viewModel.updateModels(from: Array(activities))
-        }
-        .onChange(of: activities.map { $0.startTime }) { _ in
-            viewModel.updateModels(from: Array(activities))
-        }
-        .onChange(of: activities.map { $0.endTime }) { _ in
-            viewModel.updateModels(from: Array(activities))
-        }
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
     }
 }
 
