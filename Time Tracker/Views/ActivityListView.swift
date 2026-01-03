@@ -25,7 +25,7 @@ struct ActivityListView: View {
                                 .background(
                                     GeometryReader { geo in
                                         if uiModel.endTime == nil {
-                                            Color.clear.preference(key: CurrentActivityPositionKey.self, value: geo.frame(in: .named("scroll")))
+                                            Color.clear.preference(key: ScrollFramesKey.self, value: ["currentActivity": geo.frame(in: .named("scroll"))])
                                         }
                                     }
                                 )
@@ -34,15 +34,28 @@ struct ActivityListView: View {
                         }
                     }
                     
+                    Text(Date(), style: .timer)
+                        .frame(width: 0, height: 0)
+                        .opacity(0)
+                    
                     Color.clear
                         .frame(height: 1)
                         .id("Bottom")
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear.preference(key: ScrollFramesKey.self, value: ["bottom": geo.frame(in: .named("scroll"))])
+                            }
+                        )
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .coordinateSpace(name: "scroll")
-            .overlayPreferenceValue(CurrentActivityPositionKey.self) { frame in
-                let isActivityBelowScreen = (frame?.minY ?? 0) > visibleHeight
+            .overlayPreferenceValue(ScrollFramesKey.self) { frames in
+                let currentActivityFrame = frames["currentActivity"]
+                let isActivityBelowScreen = (currentActivityFrame?.minY ?? 0) > visibleHeight
+                
+                let bottomFrame = frames["bottom"]
+                let isScrolledUp = (bottomFrame?.minY ?? 0) > (visibleHeight * 2)
                 
                 VStack {
                     Spacer()
@@ -56,13 +69,30 @@ struct ActivityListView: View {
                             } label: {
                                 ActivityContents(uiModel: currentUIModel)
                                     .bubbleStyle(isSelected: true)
+                                    .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 5)
+                            }
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    } else if isScrolledUp {
+                        HStack {
+                            
+                            Button {
+                                scrollToBottom(proxy: proxy, scrollWithAnimation: true)
+                            } label: {
+                                Image(systemName: "arrow.down.circle.fill")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.primary)
+                                    .background(Material.regular) // Glassy look
+                                    .clipShape(Circle())
+                                    .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 5)
                             }
                             .buttonStyle(.plain)
                         }
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                 }
-                .animation(.easeInOut, value: isActivityBelowScreen)
+                .animation(.easeInOut, value: isActivityBelowScreen || isScrolledUp)
             }
             .onAppear {
                 scrollToBottom(proxy: proxy, scrollWithAnimation: false)
@@ -71,26 +101,22 @@ struct ActivityListView: View {
     }
     
     private func scrollToBottom(proxy: ScrollViewProxy, scrollWithAnimation: Bool) {
-        if scrollWithAnimation {
-            proxy.scrollTo("Bottom", anchor: .bottom)
-            
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            if scrollWithAnimation {
                 withAnimation {
                     proxy.scrollTo("Bottom", anchor: .bottom)
                 }
-            }
-        } else {
-            DispatchQueue.main.async {
+            } else {
                 proxy.scrollTo("Bottom", anchor: .bottom)
             }
         }
     }
 }
 
-struct CurrentActivityPositionKey: PreferenceKey {
-    static var defaultValue: CGRect? = nil
-    static func reduce(value: inout CGRect?, nextValue: () -> CGRect?) {
-        value = value ?? nextValue()
+struct ScrollFramesKey: PreferenceKey {
+    static var defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue()) { $1 }
     }
 }
 
