@@ -71,6 +71,7 @@ struct ContentView: View {
                             .font(.title2)
                             .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
                     }
+                    .buttonStyle(.bouncy)
                 }
                 .frame(maxWidth: .infinity)
                 .bubbleStyle()

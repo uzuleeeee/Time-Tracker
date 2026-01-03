@@ -30,6 +30,7 @@ struct CategorySelectionWheel: View {
                         )
                         .tint(.primary)
                     }
+                    .buttonStyle(.bouncy)
                 }
             }
         }

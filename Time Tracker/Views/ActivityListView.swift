@@ -71,6 +71,7 @@ struct ActivityListView: View {
                                     .bubbleStyle(isSelected: true)
                                     .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 5)
                             }
+                            .buttonStyle(.bouncy)
                         }
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     } else if isScrolledUp {
@@ -80,7 +81,6 @@ struct ActivityListView: View {
                                 scrollToBottom(proxy: proxy, scrollWithAnimation: true)
                             } label: {
                                 Image(systemName: "arrow.down.circle.fill")
-                                    .font(.title3)
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(.primary)
@@ -88,7 +88,7 @@ struct ActivityListView: View {
                                     .clipShape(Circle())
                                     .shadow(color: .black.opacity(0.15), radius: 5, x: 0, y: 5)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.bouncy)
                         }
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }

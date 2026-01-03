@@ -41,7 +41,7 @@ struct GapView: View {
                             .foregroundStyle(.primary)
                             .background(Color(.systemBackground).clipShape(Circle()))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.bouncy)
                 }
                 .padding(.trailing, 16)
             }

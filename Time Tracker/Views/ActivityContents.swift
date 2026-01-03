@@ -36,6 +36,7 @@ struct ActivityContents: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(.primary)
                         }
+                        .buttonStyle(.bouncy)
                     }
                 } else if let endTime = uiModel.endTime {
                     let duration = endTime.timeIntervalSince(startTime)
