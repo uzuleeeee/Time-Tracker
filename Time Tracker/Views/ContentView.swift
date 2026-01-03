@@ -68,7 +68,7 @@ struct ContentView: View {
                         
                     } label: {
                         Image(systemName: "arrow.up.circle.fill")
-                            .font(.title3)
+                            .font(.title2)
                             .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
                     }
                 }
