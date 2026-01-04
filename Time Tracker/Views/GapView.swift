@@ -35,7 +35,7 @@ struct GapView: View {
                         .foregroundStyle(.secondary)
                     
                     Button {
-                        
+                        onAdd?()
                     } label: {
                         Image(systemName: "plus.circle.fill")
                             .foregroundStyle(.primary)

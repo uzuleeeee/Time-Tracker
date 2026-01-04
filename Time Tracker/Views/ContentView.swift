@@ -70,7 +70,9 @@ struct ContentView: View {
                 GeometryReader { scrollProxy in
                     let visibleHeight = scrollProxy.size.height
                     
-                    ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity)
+                    ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity) {
+                        isShowingAddSheet.toggle()
+                    }
                 }
                 
                 //            DailyCalendarView(activities: Array(activities))
