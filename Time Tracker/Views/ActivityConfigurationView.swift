@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ActivityConfigurationView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @State private var startTime: Date = Date()
     @State private var endTime: Date = Date()
     @State private var inputText: String = ""
@@ -36,7 +38,7 @@ struct ActivityConfigurationView: View {
             }
             
             Button {
-                
+                dismiss()
             } label: {
                 Image(systemName: "plus")
                     .padding()
