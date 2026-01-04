@@ -10,11 +10,10 @@ import SwiftUI
 struct ActivityConfigurationView: View {
     @Environment(\.dismiss) var dismiss
     
-    @State private var startTime: Date = Date()
-    @State private var endTime: Date = Date()
     @State private var inputText: String = ""
     @State var selectedCategory: Category? = nil
-    @State private var duration: Int = 0
+    @State private var startTime: Date = Date()
+    @State private var endTime: Date = Date()
     
     var categories: [Category]
     
