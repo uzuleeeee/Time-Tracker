@@ -33,6 +33,7 @@ struct ContentView: View {
     @State var selectedCategory: Category? = nil
     @State private var selectedDate: Date = Date()
     @State private var inputText: String = ""
+    @State private var isShowingAddSheet: Bool = false
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -52,7 +53,7 @@ struct ContentView: View {
                     Spacer()
 
                     Button {
-                        // Action
+                        isShowingAddSheet.toggle()
                     } label: {
                         Image(systemName: "plus")
                             .font(.title3)
@@ -108,6 +109,11 @@ struct ContentView: View {
                 viewModel.updateModels(from: Array(activities))
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
+            .sheet(isPresented: $isShowingAddSheet) {
+                ActivityConfigurationView(categories: Array(categories))
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
 }
