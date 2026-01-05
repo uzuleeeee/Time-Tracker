@@ -33,7 +33,7 @@ struct ContentView: View {
     @State var selectedCategory: Category? = nil
     @State private var selectedDate: Date = Date()
     @State private var inputText: String = ""
-    @State private var isShowingAddSheet: Bool = false
+    @State private var configurationContext: ActivityConfigurationContext? = nil
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -53,7 +53,7 @@ struct ContentView: View {
                     Spacer()
 
                     Button {
-                        isShowingAddSheet.toggle()
+                        configurationContext = ActivityConfigurationContext(startTime: Date(), endTime: Date())
                     } label: {
                         Image(systemName: "plus")
                             .font(.title3)
@@ -70,8 +70,8 @@ struct ContentView: View {
                 GeometryReader { scrollProxy in
                     let visibleHeight = scrollProxy.size.height
                     
-                    ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity) {
-                        isShowingAddSheet.toggle()
+                    ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity) { startTime, endTime in
+                        configurationContext = ActivityConfigurationContext(startTime: startTime, endTime: endTime)
                     }
                 }
                 
@@ -111,8 +111,8 @@ struct ContentView: View {
                 viewModel.updateModels(from: Array(activities))
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
-            .sheet(isPresented: $isShowingAddSheet) {
-                ActivityConfigurationView(categories: Array(categories), onSave: { name, selectedCategory, startTime, endTime in
+            .sheet(item: $configurationContext) { context in
+                ActivityConfigurationView(startTime: context.startTime, endTime: context.endTime, categories: Array(categories), onSave: { name, selectedCategory, startTime, endTime in
                     viewModel.configureActivity(name: name, category: selectedCategory, startTime: startTime, endTime: endTime, activities: activities)
                 })
                     .presentationDetents([.medium])
