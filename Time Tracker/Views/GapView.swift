@@ -37,9 +37,13 @@ struct GapView: View {
                     Button {
                         onAdd?(uiModel.startTime, uiModel.endTime)
                     } label: {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: "plus")
+                            .font(.footnote)
+                            .fontWeight(.bold)
                             .foregroundStyle(.primary)
-                            .background(Color(.systemBackground).clipShape(Circle()))
+                            .padding(4)
+                            .background(Color(.systemGray6))
+                            .clipShape(Circle())
                     }
                     .buttonStyle(.bouncy)
                 }

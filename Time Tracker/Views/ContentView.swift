@@ -49,30 +49,28 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                HStack {
-                    Spacer()
-
-                    Button {
-                        configurationContext = ActivityConfigurationContext(startTime: Date(), endTime: Date())
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.primary)
-                            .padding(8)
-//                            .background(Color(.systemGray6))
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(.bouncy)
-                }
-                .background(Color(.systemBackground))
-                
                 GeometryReader { scrollProxy in
                     let visibleHeight = scrollProxy.size.height
                     
-                    ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity) { startTime, endTime in
-                        configurationContext = ActivityConfigurationContext(startTime: startTime, endTime: endTime)
+                    ZStack(alignment: .topLeading) {
+                        ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity) { startTime, endTime in
+                            configurationContext = ActivityConfigurationContext(startTime: startTime, endTime: endTime)
+                        }
+                        
+                        Button {
+                            configurationContext = ActivityConfigurationContext(startTime: Date(), endTime: Date())
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.primary)
+                                .padding(8)
+                                .background(Color(.systemGray6))
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.bouncy)
                     }
+                    .clipShape(Rectangle())
                 }
                 
                 //            DailyCalendarView(activities: Array(activities))
