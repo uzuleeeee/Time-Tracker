@@ -19,6 +19,8 @@ struct ActivityConfigurationView: View {
     var categories: [Category]
     var onSave: ((String, Category, Date, Date) -> Void)?
     
+    @State private var predictedCategories: [Category] = []
+    
     private var isValid: Bool {
         !inputText.isEmpty && selectedCategory != nil && startTime < endTime
     }
@@ -29,7 +31,11 @@ struct ActivityConfigurationView: View {
                 TextField("Name", text: $inputText)
                     .lineLimit(1)
                     .textFieldStyle(.plain)
-                CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+                    .onChange(of: inputText) { newText in
+                        predict(newText)
+                    }
+                
+                CategorySelectionWheel(categories: predictedCategories.isEmpty ? Array(categories) : predictedCategories, selected: $selectedCategory)
             }
             
             Section {
@@ -58,6 +64,46 @@ struct ActivityConfigurationView: View {
             .listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets())
             .disabled(!isValid)
+        }
+    }
+    
+    private func predict(_ text: String) {
+        if text.isEmpty {
+            self.predictedCategories = []
+            self.selectedCategory = nil
+            return
+        }
+        
+        if !Scorer.shared.isReady {
+            self.predictedCategories = []
+            return
+        }
+        
+        let currentText = text
+        
+        Task.detached(priority: .userInitiated) {            
+            let newResults = Scorer.shared.predict(text: currentText)
+            
+            await MainActor.run {
+                setCategoriesFromResults(from: newResults)
+            }
+        }
+    }
+    
+    private func setCategoriesFromResults(from results: [(String, Float)]) {
+        // Initialize array to store mapped categories
+        var mappedCategories: [Category] = []
+        
+        for (name, _) in results {
+            if let match = categories.first(where: { $0.name == name }) {
+                mappedCategories.append(match)
+            }
+        }
+        
+        predictedCategories = mappedCategories
+        
+        if let topMatch = predictedCategories.first {
+            selectedCategory = topMatch
         }
     }
 }
