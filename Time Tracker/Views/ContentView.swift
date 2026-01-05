@@ -73,8 +73,6 @@ struct ContentView: View {
                     .clipShape(Rectangle())
                 }
                 
-                //            DailyCalendarView(activities: Array(activities))
-                
                 VStack {
                     Divider()
                     

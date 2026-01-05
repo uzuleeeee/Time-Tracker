@@ -25,10 +25,6 @@ struct GapView: View {
                 Spacer()
                 
                 HStack(spacing: 8) {
-                    //                Rectangle()
-                    //                    .fill(Color.secondary.opacity(0.3))
-                    //                    .frame(width: 1, height: 10)
-                    
                     Text(TimeFormatter.format(duration: uiModel.duration))
                         .font(.system(.footnote, design: .rounded))
                         .fontWeight(.medium)
@@ -74,35 +70,22 @@ struct GapView: View {
     }
     
     private func updateOffset(geo: GeometryProxy, displayHeight: CGFloat) {
-        // 1. Get the current vertical position of the GapView relative to the visible window
-        // (Since we moved .coordinateSpace to the frame, minY changes as we scroll)
         let frame = geo.frame(in: .named("scroll"))
         let minY = frame.minY
         
-        // 2. Define the "Safe Zone" for the text center
-        // The text center cannot go higher than half its own height (Top Edge)
-        // The text center cannot go lower than visibleHeight - half its own height (Bottom Edge)
         let halfContent = contentHeight / 2
         let safeTop = halfContent
         let safeBottom = visibleHeight - halfContent
         
-        // 3. Calculate where the text is "Naturally" (in Global Coordinates)
         let naturalCenterY = displayHeight / 2
         let currentGlobalCenterY = minY + naturalCenterY
-        
-        // 4. Calculate where the text "Wants" to be (Clamped to Safe Zone)
-        // If we are scrolling down, this logic pulls the text up to `safeBottom`.
-        // If we are scrolling up, this logic pushes the text down to `safeTop`.
         let targetGlobalCenterY = min(max(currentGlobalCenterY, safeTop), safeBottom)
         
-        // 5. Calculate the difference (Offset)
         let proposedOffset = targetGlobalCenterY - currentGlobalCenterY
         
-        // 6. Final Limit: Don't let the text leave the GapView itself!
         let maxTravel = (displayHeight - contentHeight) / 2
         
         if maxTravel > 0 {
-            // Clamp the offset to the bounds of the GapView
             stickyOffset = min(max(proposedOffset, -maxTravel), maxTravel)
         } else {
             stickyOffset = 0
