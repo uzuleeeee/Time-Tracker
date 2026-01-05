@@ -12,8 +12,9 @@ struct ActivityConfigurationView: View {
     
     @State private var inputText: String = ""
     @State var selectedCategory: Category? = nil
-    @State private var startTime: Date = Date()
-    @State private var endTime: Date = Date()
+    
+    @State var startTime: Date
+    @State var endTime: Date
     
     var categories: [Category]
     var onSave: ((String, Category, Date, Date) -> Void)?
@@ -74,5 +75,5 @@ struct ActivityConfigurationView: View {
 #Preview {
     let categories = Category.examples
     
-    ActivityConfigurationView(categories: categories)
+    ActivityConfigurationView(startTime: Date(), endTime: Date(), categories: categories)
 }
