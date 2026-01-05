@@ -214,6 +214,22 @@ class Scorer {
         return similarities.sorted { $0.1 > $1.1 }
     }
     
+    func createCategory(label: String) {
+        print("Create Category: \(label)")
+        if labelToDescriptions[label] == nil {
+            labelToDescriptions[label] = []
+            if let labelVec = textToVector(label) {
+                labelToVectors[label] = [labelVec]
+            }
+            
+            saveCache()
+            
+            print("Category '\(label)' created")
+        } else {
+            print("Category '\(label)' already exists")
+        }
+    }
+    
     func updateDescriptions(label: String, description: String) {
         if labelToDescriptions[label] == nil {
             labelToDescriptions[label] = []
