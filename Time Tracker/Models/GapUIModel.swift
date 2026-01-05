@@ -10,4 +10,6 @@ import SwiftUI
 struct GapUIModel: Identifiable {
     let id: String
     let duration: TimeInterval
+    let startTime: Date
+    let endTime: Date
 }
