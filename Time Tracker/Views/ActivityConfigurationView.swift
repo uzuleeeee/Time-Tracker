@@ -16,9 +16,10 @@ struct ActivityConfigurationView: View {
     @State private var endTime: Date = Date()
     
     var categories: [Category]
+    var onSave: ((String, Category, Date, Date) -> Void)?
     
     private var isValid: Bool {
-        !inputText.isEmpty && selectedCategory != nil
+        !inputText.isEmpty && selectedCategory != nil && startTime < endTime
     }
     
     var body: some View {
@@ -37,6 +38,10 @@ struct ActivityConfigurationView: View {
             }
             
             Button {
+                if let selectedCategory {
+                    onSave?(inputText, selectedCategory, startTime, endTime)
+                }
+                
                 dismiss()
             } label: {
                 Image(systemName: "plus")

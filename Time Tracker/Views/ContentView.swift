@@ -112,7 +112,9 @@ struct ContentView: View {
             }
             .animation(.spring(response: 0.4, dampingFraction: 0.8), value: activities.count)
             .sheet(isPresented: $isShowingAddSheet) {
-                ActivityConfigurationView(categories: Array(categories))
+                ActivityConfigurationView(categories: Array(categories), onSave: { name, selectedCategory, startTime, endTime in
+                    viewModel.configureActivity(name: name, category: selectedCategory, startTime: startTime, endTime: endTime, activities: activities)
+                })
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
             }
