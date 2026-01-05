@@ -30,7 +30,6 @@ struct ContentView: View {
     )
     private var categories: FetchedResults<Category>
     
-    @State var selectedCategory: Category? = nil
     @State private var selectedDate: Date = Date()
     @State private var inputText: String = ""
     @State private var configurationContext: ActivityConfigurationContext? = nil
@@ -55,6 +54,7 @@ struct ContentView: View {
                     ZStack(alignment: .topLeading) {
                         ActivityListView(viewModel: viewModel, visibleHeight: visibleHeight, currentActivity: currentActivity) { startTime, endTime in
                             configurationContext = ActivityConfigurationContext(startTime: startTime, endTime: endTime)
+                            print(startTime, endTime)
                         }
                         
                         Button {
@@ -76,10 +76,10 @@ struct ContentView: View {
                 VStack {
                     Divider()
                     
-                    CategorySelectionWheel(categories: Array(categories), selected: $selectedCategory)
+                    CategorySelectionWheel(categories: viewModel.getPredictedCategories().isEmpty ? Array(categories) : Array(viewModel.getPredictedCategories()), selected: $viewModel.selectedCategory)
                     
                     HStack {
-                        TextField("What are you doing?", text: $inputText)
+                        TextField("What are you doing?", text: $viewModel.inputText)
                             .lineLimit(1)
                             .textFieldStyle(.plain)
                         Button {
@@ -87,7 +87,7 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(inputText.isEmpty ? .gray.opacity(0.3) : .primary)
+                                .foregroundColor(viewModel.selectedCategory == nil ? .gray.opacity(0.3) : .primary)
                         }
                         .buttonStyle(.bouncy)
                     }
@@ -99,6 +99,7 @@ struct ContentView: View {
             .padding(.horizontal)
             .onAppear {
                 viewModel.updateModels(from: Array(activities))
+                viewModel.syncCategories(categories: Array(categories))
             }
             .onChange(of: activities.map { $0.startTime }) { _ in
                 viewModel.updateModels(from: Array(activities))

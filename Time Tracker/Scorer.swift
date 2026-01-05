@@ -156,7 +156,8 @@ class Scorer {
     private func saveCache() {
         guard let url = cacheURL else { return }
         do {
-            let data = try JSONEncoder().encode(labelToVectors)
+            let cacheData = ScorerCacheData(descriptions: self.labelToDescriptions, vectors: self.labelToVectors)
+            let data = try JSONEncoder().encode(cacheData)
             try data.write(to: url)
         } catch {
             print("Failed to save to cache: \(error)")
@@ -167,15 +168,17 @@ class Scorer {
         guard let url = cacheURL, FileManager.default.fileExists(atPath: url.path) else { return false }
         do {
             let data = try Data(contentsOf: url)
-            let cachedVectors = try JSONDecoder().decode([String: [[Float]]].self, from: data)
+            let cachedData = try JSONDecoder().decode(ScorerCacheData.self, from: data)
             
             // Load Validation
-            if Set(cachedVectors.keys) != Set(labelToDescriptions.keys) {
+            if Set(cachedData.vectors.keys) != Set(labelToDescriptions.keys) {
                 print("Cache outdated")
                 return false
             }
             
-            self.labelToVectors = cachedVectors
+            self.labelToDescriptions = cachedData.descriptions
+            self.labelToVectors = cachedData.vectors
+            
             return true
         } catch {
             print("Cache load failed \(error)")
@@ -209,6 +212,22 @@ class Scorer {
         
         // Sort descending
         return similarities.sorted { $0.1 > $1.1 }
+    }
+    
+    func createCategory(label: String) {
+        print("Create Category: \(label)")
+        if labelToDescriptions[label] == nil {
+            labelToDescriptions[label] = []
+            if let labelVec = textToVector(label) {
+                labelToVectors[label] = [labelVec]
+            }
+            
+            saveCache()
+            
+            print("Category '\(label)' created")
+        } else {
+            print("Category '\(label)' already exists")
+        }
     }
     
     func updateDescriptions(label: String, description: String) {

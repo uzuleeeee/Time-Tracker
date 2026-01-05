@@ -12,15 +12,49 @@ internal import Combine
 
 @MainActor
 class TimeTrackerViewModel: ObservableObject {
+    // Scorer
+    private let scorer: Scorer
+    private var cancellables = Set<AnyCancellable>()
+    
+    @Published var inputText = ""
+    @Published var scorerIsReady = false
+    @Published var predictedCategories: [(Category, Float)] = []
+    
+    // Core Data
     let viewContext: NSManagedObjectContext
     
+    // Initialize
     init(viewContext: NSManagedObjectContext) {
+        // Core Data
         self.viewContext = viewContext
+        
+        // Scorer
+        self.scorer = Scorer.shared
+        
+        if scorer.isReady {
+            self.scorerIsReady = true
+        }
+        
+        // Listen for ready notification
+        NotificationCenter.default.publisher(for: .modelReady)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.scorerIsReady = true
+            }
+            .store(in: &cancellables)
+        
+        $inputText
+            .dropFirst()
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] text in
+                self?.predict(text)
+            }
+            .store(in: &cancellables)
     }
     
     // UI state
     @Published var selectedCategory: Category?
-    @Published var activityName: String = ""
     @Published var timelineItems: [TimelineItem] = []
     
     // Live activity
@@ -52,15 +86,19 @@ class TimeTrackerViewModel: ObservableObject {
             newActivity.id = UUID()
             newActivity.startTime = Date()
             newActivity.category = category
-            newActivity.name = activityName.isEmpty ? nil : activityName
+            newActivity.name = inputText.isEmpty ? nil : inputText
             newActivity.endTime = nil // Explicitly nil implies running
             
             saveContext()
             
             startLiveActivity(newActivity)
             
+            if let categoryName = category.name {
+                scorer.updateDescriptions(label: categoryName, description: inputText.isEmpty ? inputText : "")
+            }
+            
             // Reset UI
-            activityName = ""
+            inputText = ""
         }
     }
 
@@ -130,6 +168,8 @@ class TimeTrackerViewModel: ObservableObject {
             saveContext()
         }
     }
+    
+    // Timeline Update
 
     func updateModels(from activities: [Activity]) {
         let sortedActivities = activities.sorted { $0.startTime ?? Date.distantPast < $1.startTime ?? Date.distantPast }
@@ -149,6 +189,7 @@ class TimeTrackerViewModel: ObservableObject {
                         let gapDuration = currStart.timeIntervalSince(prevEnd)
                         if gapDuration > 60 {
                             timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: prevEnd, endTime: currStart)))
+                            print(prevEnd, currStart)
                         }
                     }
                 }
@@ -162,6 +203,51 @@ class TimeTrackerViewModel: ObservableObject {
         }
         
         self.timelineItems = timelineItems
+    }
+    
+    // Scorer
+    
+    func predict(_ text: String) {
+        if text.isEmpty {
+            self.predictedCategories = []
+            self.selectedCategory = nil
+            return
+        }
+        
+        if !scorerIsReady {
+            self.predictedCategories = []
+            return
+        }
+        
+        let currentText = text
+        
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            
+            let newResults = scorer.predict(text: currentText)
+            
+            await MainActor.run {
+                self.setCategoriesFromResults(from: newResults)
+            }
+        }
+    }
+    
+    func syncCategories(categories: [Category]) {
+        let names = categories.compactMap { $0.name }
+        
+        Task.detached(priority: .background) { [weak self] in
+            guard let self = self else { return }
+            await self.scorer.setup() // Ensure model is loaded
+            
+            // Loop through every category in Core Data
+            for name in names {
+                self.scorer.createCategory(label: name)
+            }
+        }
+    }
+    
+    func getPredictedCategories() -> [Category] {
+        return predictedCategories.map { $0.0 }
     }
     
     // Internal helpers
@@ -180,6 +266,40 @@ class TimeTrackerViewModel: ObservableObject {
     private func areConnected(prev: Activity, curr: Activity) -> Bool {
         guard let prevEnd = prev.endTime, let currStart = curr.startTime else { return false }
         return abs(currStart.timeIntervalSince(prevEnd)) < 60
+    }
+    
+    // Internal helpers - Scorer
+    
+    private func setCategoriesFromResults(from results: [(String, Float)]) {
+        // Initialize array to store mapped categories
+        var mappedCategories: [(Category, Float)] = []
+        
+        // Get names from results
+        let names = results.map { $0.0 }
+        
+        // Fetch actual Category objects from Core Data
+        let request: NSFetchRequest<Category> = Category.fetchRequest()
+        request.predicate = NSPredicate(format: "name in %@", names)
+        request.returnsObjectsAsFaults = false
+        
+        do {
+            let matches = try viewContext.fetch(request)
+            
+            for (name, score) in results {
+                if let match = matches.first(where: { $0.name == name }) {
+                    mappedCategories.append((match, score))
+                }
+            }
+            
+            self.predictedCategories = mappedCategories
+            
+            if let topMatch = mappedCategories.first {
+                self.selectedCategory = topMatch.0
+            }
+        } catch {
+            print("Failed to fetch categories: \(error)")
+            self.predictedCategories = []
+        }
     }
     
     // Live Activity
