@@ -59,16 +59,6 @@ struct ActivityConfigurationView: View {
             .listRowInsets(EdgeInsets())
             .disabled(!isValid)
         }
-        .onChange(of: startTime) { newStartTime in
-            if endTime < newStartTime {
-                endTime = newStartTime
-            }
-        }
-        .onChange(of: endTime) { newEndTime in
-            if startTime > newEndTime {
-                startTime = newEndTime
-            }
-        }
     }
 }
 
