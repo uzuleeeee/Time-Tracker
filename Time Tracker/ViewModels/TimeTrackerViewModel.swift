@@ -148,7 +148,7 @@ class TimeTrackerViewModel: ObservableObject {
                     if let prevEnd = prevActivity.endTime, let currStart = currentActivity.startTime {
                         let gapDuration = currStart.timeIntervalSince(prevEnd)
                         if gapDuration > 60 {
-                            timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration)))
+                            timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: prevEnd, endTime: currStart)))
                         }
                     }
                 }
