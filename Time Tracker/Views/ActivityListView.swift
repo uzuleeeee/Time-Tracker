@@ -80,7 +80,6 @@ struct ActivityListView: View {
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     } else if isScrolledUp {
                         HStack {
-                            
                             Button {
                                 scrollToBottom(proxy: proxy, scrollWithAnimation: true)
                             } label: {
@@ -97,6 +96,7 @@ struct ActivityListView: View {
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                 }
+                .padding(.bottom, 6)
                 .animation(.easeInOut, value: isActivityBelowScreen || isScrolledUp)
             }
             .onAppear {
