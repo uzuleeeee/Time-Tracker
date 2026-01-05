@@ -12,6 +12,8 @@ struct ActivityListView: View {
     let visibleHeight: CGFloat
     let currentActivity: Activity?
     
+    var onAdd: ((Date, Date) -> Void)? = nil
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
@@ -30,7 +32,9 @@ struct ActivityListView: View {
                                     }
                                 )
                         case .gap(let uiModel):
-                            GapView(uiModel: uiModel, visibleHeight: visibleHeight)
+                            GapView(uiModel: uiModel, visibleHeight: visibleHeight) { startTime, endTime in
+                                onAdd?(startTime, endTime)
+                            }
                         }
                     }
                     

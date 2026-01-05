@@ -75,6 +75,53 @@ class TimeTrackerViewModel: ObservableObject {
         }
     }
     
+    func configureActivity(name: String, category: Category, startTime: Date, endTime: Date, activities: FetchedResults<Activity>) {
+        print("Configure activity: \(name) \(category.uiModel.name) \(startTime) \(endTime)")
+        
+        withAnimation {
+            let newActivity = Activity(context: viewContext)
+            newActivity.id = UUID()
+            newActivity.name = name.isEmpty ? nil : name
+            newActivity.category = category
+            newActivity.startTime = startTime
+            newActivity.endTime = endTime
+            
+            for activity in activities {
+                let currentStart = activity.startTime ?? Date.distantPast
+                let currentEnd = activity.endTime ?? Date.distantPast
+                
+                // Check for overlap
+                if (currentStart < endTime) && (currentEnd > startTime) {
+                    if (currentStart >= startTime) && (currentEnd <= endTime) {
+                        // Delete
+                        viewContext.delete(activity)
+                    } else if (currentStart < startTime) && (currentEnd > endTime) {
+                        // Split
+                        
+                        // First half
+                        let firstHalf = Activity(context: viewContext)
+                        firstHalf.id = UUID()
+                        firstHalf.name = activity.name
+                        firstHalf.category = activity.category
+                        firstHalf.startTime = activity.startTime
+                        firstHalf.endTime = startTime
+                        
+                        // Second half
+                        activity.startTime = endTime
+                    } else if currentStart < startTime {
+                        // Trim tail
+                        activity.endTime = startTime
+                    } else {
+                        // Trim head
+                        activity.startTime = endTime
+                    }
+                }
+            }
+            
+            saveContext()
+        }
+    }
+    
     func deleteItems(offsets: IndexSet, activities: FetchedResults<Activity>) {
         print("Delete item")
         
@@ -101,7 +148,7 @@ class TimeTrackerViewModel: ObservableObject {
                     if let prevEnd = prevActivity.endTime, let currStart = currentActivity.startTime {
                         let gapDuration = currStart.timeIntervalSince(prevEnd)
                         if gapDuration > 60 {
-                            timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration)))
+                            timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: prevEnd, endTime: currStart)))
                         }
                     }
                 }
