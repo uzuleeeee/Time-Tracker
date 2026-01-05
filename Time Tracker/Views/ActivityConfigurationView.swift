@@ -22,7 +22,7 @@ struct ActivityConfigurationView: View {
     @State private var predictedCategories: [Category] = []
     
     private var isValid: Bool {
-        !inputText.isEmpty && selectedCategory != nil && startTime < endTime
+        selectedCategory != nil && startTime < endTime && endTime < Date()
     }
     
     var body: some View {
@@ -39,9 +39,9 @@ struct ActivityConfigurationView: View {
             }
             
             Section {
-                DatePicker("Start: ", selection: $startTime, in: ...Date())
+                DatePicker("Start: ", selection: $startTime)
                 
-                DatePicker("End: ", selection: $endTime, in: ...Date())
+                DatePicker("End: ", selection: $endTime)
             }
             
             Button {

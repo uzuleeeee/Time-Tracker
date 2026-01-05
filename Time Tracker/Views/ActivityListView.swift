@@ -32,8 +32,8 @@ struct ActivityListView: View {
                                     }
                                 )
                         case .gap(let uiModel):
-                            GapView(uiModel: uiModel, visibleHeight: visibleHeight) { startTime, endTime in
-                                onAdd?(startTime, endTime)
+                            GapView(uiModel: uiModel, visibleHeight: visibleHeight) {
+                                onAdd?(uiModel.startTime, uiModel.endTime)
                             }
                         }
                     }

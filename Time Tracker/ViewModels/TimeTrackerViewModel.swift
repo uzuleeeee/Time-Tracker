@@ -180,6 +180,8 @@ class TimeTrackerViewModel: ObservableObject {
             let currentActivity = sortedActivities[index]
             var currentUIModel = currentActivity.uiModel
             
+            print(currentUIModel.startTime, currentUIModel.endTime)
+            
             if index > 0 {
                 let prevActivity = sortedActivities[index - 1]
                 if areConnected(prev: prevActivity, curr: currentActivity) {

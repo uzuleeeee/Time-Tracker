@@ -11,7 +11,7 @@ struct GapView: View {
     let uiModel: GapUIModel
     var hourHeight: CGFloat = 80
     var visibleHeight: CGFloat
-    var onAdd: ((Date, Date) -> Void)? = nil
+    var onAdd: (() -> Void)? = nil
     
     @State private var contentHeight: CGFloat = 0
     @State private var stickyOffset: CGFloat = 0
@@ -31,7 +31,7 @@ struct GapView: View {
                         .foregroundStyle(.secondary)
                     
                     Button {
-                        onAdd?(uiModel.startTime, uiModel.endTime)
+                        onAdd?()
                     } label: {
                         Image(systemName: "plus")
                             .font(.footnote)
