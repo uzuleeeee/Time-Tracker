@@ -11,7 +11,7 @@ struct GapView: View {
     let uiModel: GapUIModel
     var hourHeight: CGFloat = 80
     var visibleHeight: CGFloat
-    var onAdd: (() -> Void)? = nil
+    var onAdd: ((Date, Date) -> Void)? = nil
     
     @State private var contentHeight: CGFloat = 0
     @State private var stickyOffset: CGFloat = 0
@@ -35,7 +35,7 @@ struct GapView: View {
                         .foregroundStyle(.secondary)
                     
                     Button {
-                        onAdd?()
+                        onAdd?(uiModel.startTime, uiModel.endTime)
                     } label: {
                         Image(systemName: "plus.circle.fill")
                             .foregroundStyle(.primary)
@@ -111,9 +111,9 @@ struct GapView: View {
         Color(.systemBackground).edgesIgnoringSafeArea(.all)
         
         VStack {
-            GapView(uiModel: GapUIModel(id: "a", duration: 15 * 60), visibleHeight: 800)
+            GapView(uiModel: GapUIModel(id: "a", duration: 15 * 60, startTime: Date(), endTime: Date()), visibleHeight: 800)
             
-            GapView(uiModel: GapUIModel(id: "b", duration: 2 * 3600), visibleHeight: 800)
+            GapView(uiModel: GapUIModel(id: "b", duration: 2 * 3600, startTime: Date(), endTime: Date()), visibleHeight: 800)
                 .background(Color.blue.opacity(0.3))
         }
     }
