@@ -29,17 +29,19 @@ struct ActivityListView: View {
                                     viewModel.stopActivity(currentActivity)
                                 }
                             })
-                                .background(
-                                    GeometryReader { geo in
-                                        if uiModel.endTime == nil {
-                                            Color.clear.preference(key: ScrollFramesKey.self, value: ["currentActivity": geo.frame(in: .named("scroll"))])
-                                        }
+                            .id(uiModel.id)
+                            .background(
+                                GeometryReader { geo in
+                                    if uiModel.endTime == nil {
+                                        Color.clear.preference(key: ScrollFramesKey.self, value: ["currentActivity": geo.frame(in: .named("scroll"))])
                                     }
-                                )
+                                }
+                            )
                         case .gap(let uiModel):
                             GapView(uiModel: uiModel, visibleHeight: visibleHeight) {
                                 onAdd?(uiModel.startTime, uiModel.endTime)
                             }
+                            .id(uiModel.id)
                         }
                     }
                     
@@ -106,6 +108,16 @@ struct ActivityListView: View {
             }
             .onAppear {
                 scrollToBottom(proxy: proxy, scrollWithAnimation: false)
+            }
+            .onReceive(viewModel.scrollSubject) { action in
+                withAnimation {
+                    switch action {
+                    case .bottom:
+                        proxy.scrollTo("Bottom", anchor: .bottom)
+                    case .id(let id):
+                        proxy.scrollTo(id, anchor: .center)
+                    }
+                }
             }
         }
     }

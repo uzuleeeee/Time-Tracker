@@ -10,6 +10,11 @@ import CoreData
 import ActivityKit
 internal import Combine
 
+enum ScrollAction {
+    case bottom
+    case id(UUID)
+}
+
 @MainActor
 class TimeTrackerViewModel: ObservableObject {
     // Scorer
@@ -57,6 +62,8 @@ class TimeTrackerViewModel: ObservableObject {
     @Published var selectedCategory: Category?
     @Published var timelineItems: [TimelineItem] = []
     
+    let scrollSubject = PassthroughSubject<ScrollAction, Never>()
+    
     // Live activity
     private var currentLiveActivity: ActivityKit.Activity<TimeTrackerWidgetAttributes>?
     
@@ -96,6 +103,8 @@ class TimeTrackerViewModel: ObservableObject {
             if let categoryName = category.name {
                 scorer.updateDescriptions(label: categoryName, description: inputText.isEmpty ? inputText : "")
             }
+            
+            scrollSubject.send(.bottom)
             
             // Reset UI
             inputText = ""
@@ -172,6 +181,12 @@ class TimeTrackerViewModel: ObservableObject {
             }
             
             saveContext()
+            
+            if let newActivityID = newActivity.id {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    self?.scrollSubject.send(.id(newActivityID))
+                }
+            }
         }
     }
     
