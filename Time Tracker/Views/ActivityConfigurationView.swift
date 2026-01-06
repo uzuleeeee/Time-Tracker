@@ -22,7 +22,7 @@ struct ActivityConfigurationView: View {
     @State private var predictedCategories: [Category] = []
     
     private var isValid: Bool {
-        selectedCategory != nil && startTime < endTime && endTime < Date()
+        selectedCategory != nil && startTime < endTime && endTime <= Date()
     }
     
     var body: some View {

@@ -107,6 +107,18 @@ class TimeTrackerViewModel: ObservableObject {
         
         withAnimation {
             activity.endTime = Date()
+            
+            if let startTime = activity.startTime, let endTime = activity.endTime {
+                let duration = endTime.timeIntervalSince(startTime)
+                
+                if duration < 3 || startTime > endTime {
+                    print("Deleting invalid activity (Duration: \(duration)")
+                    viewContext.delete(activity)
+                }
+            } else {
+                viewContext.delete(activity)
+            }
+            
             saveContext()
             
             stopLiveActivity()
@@ -115,6 +127,9 @@ class TimeTrackerViewModel: ObservableObject {
     
     func configureActivity(name: String, category: Category, startTime: Date, endTime: Date, activities: FetchedResults<Activity>) {
         print("Configure activity: \(name) \(category.uiModel.name) \(startTime) \(endTime)")
+        
+        guard startTime < endTime else { return }
+        guard endTime <= Date().addingTimeInterval(10) else { return }
         
         withAnimation {
             let newActivity = Activity(context: viewContext)

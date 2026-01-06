@@ -13,6 +13,7 @@ struct ActivityListView: View {
     let currentActivity: Activity?
     
     var onAdd: ((Date, Date) -> Void)? = nil
+    var onStop: (() -> Void)? = nil
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -23,7 +24,11 @@ struct ActivityListView: View {
                         case .activity(let uiModel):
                             let isActive = uiModel.endTime == nil
                             
-                            ActivityView(uiModel: uiModel, isActive: isActive)
+                            ActivityView(uiModel: uiModel, isActive: isActive, onStop: {
+                                if let currentActivity = self.currentActivity, currentActivity.id == uiModel.id {
+                                    viewModel.stopActivity(currentActivity)
+                                }
+                            })
                                 .background(
                                     GeometryReader { geo in
                                         if uiModel.endTime == nil {
