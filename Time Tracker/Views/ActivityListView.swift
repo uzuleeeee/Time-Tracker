@@ -85,7 +85,7 @@ struct ActivityListView: View {
                             } label: {
                                 Image(systemName: "arrow.down.circle.fill")
                                     .font(.title2)
-                                    .fontWeight(.bold)
+                                    .bold()
                                     .foregroundStyle(.primary)
                                     .background(Material.regular) // Glassy look
                                     .clipShape(Circle())

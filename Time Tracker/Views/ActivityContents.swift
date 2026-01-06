@@ -34,6 +34,7 @@ struct ActivityContents: View {
                             
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
+                                .bold()
                                 .foregroundColor(.primary)
                         }
                         .buttonStyle(.bouncy)

@@ -61,7 +61,7 @@ struct ContentView: View {
                             configurationContext = ActivityConfigurationContext(startTime: Date(), endTime: Date())
                         } label: {
                             Image(systemName: "plus")
-                                .font(.title3)
+                                .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundStyle(.primary)
                                 .padding(8)
@@ -87,6 +87,7 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.title2)
+                                .bold()
                                 .foregroundColor(viewModel.selectedCategory == nil ? .gray.opacity(0.3) : .primary)
                         }
                         .buttonStyle(.bouncy)
