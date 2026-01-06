@@ -44,12 +44,14 @@ struct ActivityView: View {
                     if let endTime = uiModel.endTime {
                         Text(endTime, format: .dateTime.hour().minute())
                     } else {
-                        HStack(spacing: 4) {
-                            Text("Now")
-                            Image(systemName: "circle.fill")
-                                .font(.system(size: 4))
-                                .foregroundStyle(.secondary)
-                            Text(Date(), format: .dateTime.hour().minute())
+                        TimelineView(.periodic(from: .now, by: 1.0)) { context in
+                            HStack(spacing: 4) {
+                                Text("Now")
+                                Image(systemName: "circle.fill")
+                                    .font(.system(size: 4))
+                                    .foregroundStyle(.secondary)
+                                Text(context.date, format: .dateTime.hour().minute())
+                            }
                         }
                     }
                 }
