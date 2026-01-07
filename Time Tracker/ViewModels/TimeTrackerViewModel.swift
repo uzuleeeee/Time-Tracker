@@ -203,36 +203,61 @@ class TimeTrackerViewModel: ObservableObject {
     // Timeline Update
 
     func updateModels(from activities: [Activity]) {
+        print("update models")
         let sortedActivities = activities.sorted { $0.startTime ?? Date.distantPast < $1.startTime ?? Date.distantPast }
         
         var timelineItems: [TimelineItem] = []
         
+        // Loop through sorted activities
         for index in sortedActivities.indices {
             let currentActivity = sortedActivities[index]
             var currentUIModel = currentActivity.uiModel
             
-            print(currentUIModel.startTime, currentUIModel.endTime)
-            
+            // Check for connection between previous and current activity
             if index > 0 {
                 let prevActivity = sortedActivities[index - 1]
                 if areConnected(prev: prevActivity, curr: currentActivity) {
                     currentUIModel.topConnected = true
                 } else {
                     if let prevEnd = prevActivity.endTime, let currStart = currentActivity.startTime {
-                        let gapDuration = currStart.timeIntervalSince(prevEnd)
+                        // Update gap end time if in future
+                        var endTime = currStart
+                        
+                        if endTime > Date() {
+                            endTime = Date()
+                        }
+                        
+                        // Append gap only if > 60 seconds
+                        let gapDuration = endTime.timeIntervalSince(prevEnd)
                         if gapDuration > 60 {
-                            timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: prevEnd, endTime: currStart)))
-                            print(prevEnd, currStart)
+                            if prevEnd < Date() {
+                                timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: prevEnd, endTime: endTime)))
+                            }
                         }
                     }
                 }
             }
             
+            // Check for connection between current and next activity
             if index < sortedActivities.count - 1, areConnected(prev: currentActivity, curr: sortedActivities[index + 1]) {
                 currentUIModel.bottomConnected = true
             }
             
-            timelineItems.append(.activity(currentUIModel))
+            // Update activity end time if in future
+            if let startTime = currentUIModel.startTime, startTime < Date() {
+                if let endTime = currentUIModel.endTime, endTime > Date() {
+                    currentUIModel.endTime = Date()
+                }
+                
+                timelineItems.append(.activity(currentUIModel))
+            }
+        }
+        
+        // Check if gap should exist at end
+        if let lastActivity = sortedActivities.last, let endTime = lastActivity.endTime, endTime <= Date() {
+            let gapDuration = Date().timeIntervalSince(endTime)
+            timelineItems.append(.gap(GapUIModel(id: "trailling-\(lastActivity.uiModel.id)", duration: gapDuration, startTime: endTime, endTime: Date())))
+            print("gap appended at the end")
         }
         
         self.timelineItems = timelineItems

@@ -38,8 +38,10 @@ struct ActivityListView: View {
                                 }
                             )
                         case .gap(let uiModel):
-                            GapView(uiModel: uiModel, visibleHeight: visibleHeight) {
-                                onAdd?(uiModel.startTime, uiModel.endTime)
+                            let isLastItem = item.id == viewModel.timelineItems.last?.id
+                            
+                            GapView(uiModel: uiModel, visibleHeight: visibleHeight, isActive: isLastItem) {
+                                onAdd?(uiModel.startTime, isLastItem ? Date() : uiModel.endTime)
                             }
                             .id(uiModel.id)
                         }
