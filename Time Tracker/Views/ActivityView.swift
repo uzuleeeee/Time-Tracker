@@ -20,6 +20,16 @@ struct ActivityView: View {
     var onStop: (() -> Void)? = nil
     
     var body: some View {
+        if isActive {
+            TimelineView(.periodic(from: .now, by: 1.0)) { context in
+                activityContent()
+            }
+        } else {
+            activityContent()
+        }
+    }
+    
+    private func activityContent() -> some View {
         let duration: TimeInterval = {
             if let end = uiModel.endTime, let start = uiModel.startTime {
                 return end.timeIntervalSince(start)
@@ -33,7 +43,7 @@ struct ActivityView: View {
         let calculatedHeight = (duration / 3600.0) * hourHeight
         let displayHeight = max(calculatedHeight, contentHeight)
         
-        HStack {
+        return HStack {
             VStack(alignment: .trailing) {
                 if let startTime = uiModel.startTime {
                     Text(startTime, format: .dateTime.hour().minute())
@@ -46,14 +56,12 @@ struct ActivityView: View {
                     if let endTime = uiModel.endTime {
                         Text(endTime, format: .dateTime.hour().minute())
                     } else {
-                        TimelineView(.periodic(from: .now, by: 1.0)) { context in
-                            HStack(spacing: 4) {
-                                Text("Now")
-                                Image(systemName: "circle.fill")
-                                    .font(.system(size: 4))
-                                    .foregroundStyle(.secondary)
-                                Text(context.date, format: .dateTime.hour().minute())
-                            }
+                        HStack(spacing: 4) {
+                            Text("Now")
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 4))
+                                .foregroundStyle(.secondary)
+                            Text(Date(), format: .dateTime.hour().minute())
                         }
                     }
                 }
