@@ -13,6 +13,7 @@ struct ActivityListView: View {
     let currentActivity: Activity?
     
     var onAdd: ((Date, Date) -> Void)? = nil
+    var onStop: (() -> Void)? = nil
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -23,18 +24,26 @@ struct ActivityListView: View {
                         case .activity(let uiModel):
                             let isActive = uiModel.endTime == nil
                             
-                            ActivityView(uiModel: uiModel, isActive: isActive)
-                                .background(
-                                    GeometryReader { geo in
-                                        if uiModel.endTime == nil {
-                                            Color.clear.preference(key: ScrollFramesKey.self, value: ["currentActivity": geo.frame(in: .named("scroll"))])
-                                        }
+                            ActivityView(uiModel: uiModel, isActive: isActive, onStop: {
+                                if let currentActivity = self.currentActivity, currentActivity.id == uiModel.id {
+                                    viewModel.stopActivity(currentActivity)
+                                }
+                            })
+                            .id(uiModel.id)
+                            .background(
+                                GeometryReader { geo in
+                                    if uiModel.endTime == nil {
+                                        Color.clear.preference(key: ScrollFramesKey.self, value: ["currentActivity": geo.frame(in: .named("scroll"))])
                                     }
-                                )
+                                }
+                            )
                         case .gap(let uiModel):
-                            GapView(uiModel: uiModel, visibleHeight: visibleHeight) {
-                                onAdd?(uiModel.startTime, uiModel.endTime)
+                            let isLastItem = item.id == viewModel.timelineItems.last?.id
+                            
+                            GapView(uiModel: uiModel, visibleHeight: visibleHeight, isActive: isLastItem) {
+                                onAdd?(uiModel.startTime, isLastItem ? Date() : uiModel.endTime)
                             }
+                            .id(uiModel.id)
                         }
                     }
                     
@@ -101,6 +110,16 @@ struct ActivityListView: View {
             }
             .onAppear {
                 scrollToBottom(proxy: proxy, scrollWithAnimation: false)
+            }
+            .onReceive(viewModel.scrollSubject) { action in
+                withAnimation {
+                    switch action {
+                    case .bottom:
+                        proxy.scrollTo("Bottom", anchor: .bottom)
+                    case .id(let id):
+                        proxy.scrollTo(id, anchor: .center)
+                    }
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ struct ActivityUIModel: Identifiable, Equatable {
     let category: CategoryUIModel
     
     let startTime: Date?
-    let endTime: Date?
+    var endTime: Date?
     let description: String?
     
     var topConnected: Bool = false

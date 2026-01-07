@@ -10,6 +10,8 @@ import SwiftUI
 struct ActivityContents: View {
     let uiModel: ActivityUIModel
     
+    var onStop: (() -> Void)? = nil
+    
     var body: some View {
         HStack {
             if let description = uiModel.description {
@@ -31,7 +33,7 @@ struct ActivityContents: View {
                     HStack {
                         Text(startTime, style: .timer)
                         Button {
-                            
+                            onStop?()
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
                                 .bold()

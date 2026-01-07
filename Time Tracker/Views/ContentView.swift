@@ -83,7 +83,13 @@ struct ContentView: View {
                             .lineLimit(1)
                             .textFieldStyle(.plain)
                         Button {
-                            
+                            if let selectedCategory = viewModel.selectedCategory {
+                                if let currentActivity {
+                                    viewModel.stopActivity(currentActivity)
+                                }
+                                viewModel.startActivity(for: selectedCategory)
+                                viewModel.updateModels(from: Array(activities))
+                            }
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.title2)

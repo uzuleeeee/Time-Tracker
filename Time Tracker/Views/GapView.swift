@@ -11,21 +11,38 @@ struct GapView: View {
     let uiModel: GapUIModel
     var hourHeight: CGFloat = 80
     var visibleHeight: CGFloat
+    var isActive: Bool = false
     var onAdd: (() -> Void)? = nil
     
     @State private var contentHeight: CGFloat = 0
     @State private var stickyOffset: CGFloat = 0
     
     var body: some View {
-        let calculatedHeight = (uiModel.duration / 3600.0) * hourHeight
+        if isActive {
+            TimelineView(.periodic(from: .now, by: 1.0)) { context in
+                let duration = context.date.timeIntervalSince(uiModel.startTime)
+                
+                if duration >= 60 {
+                    gapContent(duration: duration)
+                }
+            }
+        } else {
+            if uiModel.duration >= 60 {
+                gapContent(duration: uiModel.duration)
+            }
+        }
+    }
+    
+    private func gapContent(duration: TimeInterval) -> some View {
+        let calculatedHeight = (duration / 3600.0) * hourHeight
         let displayHeight = max(calculatedHeight, contentHeight)
         
-        ZStack(alignment: .center) {
+        return ZStack(alignment: .center) {
             HStack {
                 Spacer()
                 
                 HStack(spacing: 8) {
-                    Text(TimeFormatter.format(duration: uiModel.duration))
+                    Text(TimeFormatter.format(duration: duration))
                         .font(.system(.footnote, design: .rounded))
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
@@ -100,7 +117,7 @@ struct GapView: View {
         VStack {
             GapView(uiModel: GapUIModel(id: "a", duration: 15 * 60, startTime: Date(), endTime: Date()), visibleHeight: 800)
             
-            GapView(uiModel: GapUIModel(id: "b", duration: 2 * 3600, startTime: Date(), endTime: Date()), visibleHeight: 800)
+            GapView(uiModel: GapUIModel(id: "b", duration: 2 * 3600, startTime: Date(), endTime: Date()), visibleHeight: 800, isActive: true)
                 .background(Color.blue.opacity(0.3))
         }
     }

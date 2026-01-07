@@ -17,6 +17,8 @@ struct ActivityView: View {
     @State private var contentHeight: CGFloat = 0
     @State private var stickyOffset: CGFloat = 0
     
+    var onStop: (() -> Void)? = nil
+    
     var body: some View {
         let duration: TimeInterval = {
             if let end = uiModel.endTime, let start = uiModel.startTime {
@@ -61,7 +63,7 @@ struct ActivityView: View {
             .foregroundStyle(.secondary)
             
             VStack {
-                ActivityContents(uiModel: uiModel)
+                ActivityContents(uiModel: uiModel, onStop: onStop)
                 // Measure the text content height
                 .background(
                     GeometryReader { contentGeo in

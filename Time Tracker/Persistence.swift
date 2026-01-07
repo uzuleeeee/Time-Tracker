@@ -79,9 +79,9 @@ struct PersistenceController {
         createActivity(work, 16, 30, 60, "Wrap up")
 
         createActivity(fitness, 18, 0, 45, "Run")
-        createActivity(lunch, 19, 0, 45, "Dinner")
-        createActivity(leisure, 20, 0, 90, "Gaming")
-        createActivity(study, 21, 30, nil, "Reading")
+//        createActivity(lunch, 19, 0, 45, "Dinner")
+        createActivity(leisure, 20, 0, 30, "Gaming")
+        createActivity(study, 21, 30, 5, "Reading")
         
         do {
             try viewContext.save()
