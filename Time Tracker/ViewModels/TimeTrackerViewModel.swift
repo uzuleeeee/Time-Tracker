@@ -108,6 +108,7 @@ class TimeTrackerViewModel: ObservableObject {
             
             // Reset UI
             inputText = ""
+            selectedCategory = nil
         }
     }
 
