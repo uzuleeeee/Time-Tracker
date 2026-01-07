@@ -203,64 +203,138 @@ class TimeTrackerViewModel: ObservableObject {
     // Timeline Update
 
     func updateModels(from activities: [Activity]) {
-        print("update models")
+        print("Update models")
         let sortedActivities = activities.sorted { $0.startTime ?? Date.distantPast < $1.startTime ?? Date.distantPast }
+        
+        let now = Date()
+        
+        // Validate activities
+        var hasChanges = false
+        var lastEndTime = Date.distantPast
+        
+        var validActivities: [Activity] = []
+        
+        for activity in sortedActivities {
+            var shouldDelete = false
+            
+            // Get start time
+            guard let startTime = activity.startTime else {
+                print("\(activity.uiModel.category.name) start time doesn't exist")
+                return
+            }
+            
+            // Get end time
+            guard let endTime = activity.endTime else {
+                // Activity is running
+                // Append running activity and break
+                print("\(activity.uiModel.category.name) end time doesn't exist. It is active. Not including all future activities.")
+                validActivities.append(activity)
+                break
+            }
+            
+            // Check if activity starts in the future
+            if startTime > now {
+                // Activity starts in the future
+                // Do not append and break
+                print("\(activity.uiModel.category.name) starts in the future. Exiting loop.")
+                break
+            }
+            
+            // Check if activity ends in the future
+            if endTime > now {
+                // Activity ends in the future
+                // Trim end time
+                print("\(activity.uiModel.category.name) ends in the future. Trim end time to now")
+                activity.endTime = now
+                hasChanges = true
+            }
+            
+            // Check for overlap
+            if startTime < lastEndTime {
+                print("\(activity.uiModel.category.name) overlaps with previous activity")
+                activity.startTime = lastEndTime
+                hasChanges = true
+            }
+            
+            // Check duration
+            let validStart = activity.startTime ?? Date.distantPast
+            let validEnd = activity.endTime ?? now
+            let duration = validEnd.timeIntervalSince(validStart)
+            
+            if duration < 1 {
+                shouldDelete = true
+            }
+            
+            if shouldDelete {
+                print("Deleting \(activity.uiModel.category.name) due to invalid duration")
+                viewContext.delete(activity)
+                hasChanges = true
+            } else {
+                lastEndTime = validEnd
+                validActivities.append(activity)
+            }
+        }
+        
+        if hasChanges {
+            saveContext()
+        }
         
         var timelineItems: [TimelineItem] = []
         
         // Loop through sorted activities
-        for index in sortedActivities.indices {
+        for index in validActivities.indices {
             let currentActivity = sortedActivities[index]
             var currentUIModel = currentActivity.uiModel
             
-            // Check for connection between previous and current activity
+            print(index, currentUIModel.category.name)
+            
             if index > 0 {
-                let prevActivity = sortedActivities[index - 1]
-                if areConnected(prev: prevActivity, curr: currentActivity) {
+                let previousActivity = validActivities[index - 1]
+                
+                // If connected with previous activity, make top connected
+                if areConnected(prev: previousActivity, curr: currentActivity) {
+                    print("Top connected")
                     currentUIModel.topConnected = true
                 } else {
-                    if let prevEnd = prevActivity.endTime, let currStart = currentActivity.startTime {
-                        // Update gap end time if in future
-                        var endTime = currStart
-                        
-                        if endTime > Date() {
-                            endTime = Date()
-                        }
-                        
+                    // If not connected with previous activity, add leading gap
+                    if let previousEnd = previousActivity.endTime, let currentStart = currentActivity.startTime {
                         // Append gap only if > 60 seconds
-                        let gapDuration = endTime.timeIntervalSince(prevEnd)
+                        let gapDuration = currentStart.timeIntervalSince(previousEnd)
                         if gapDuration > 60 {
-                            if prevEnd < Date() {
-                                timelineItems.append(.gap(GapUIModel(id: "\(prevActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: prevEnd, endTime: endTime)))
-                            }
+                            print("Appending leading gap")
+                            timelineItems.append(.gap(GapUIModel(id: "\(previousActivity.uiModel.id)-\(currentActivity.uiModel.id)", duration: gapDuration, startTime: previousEnd, endTime: currentStart)))
                         }
                     }
                 }
             }
             
-            // Check for connection between current and next activity
-            if index < sortedActivities.count - 1, areConnected(prev: currentActivity, curr: sortedActivities[index + 1]) {
-                currentUIModel.bottomConnected = true
+            if index < validActivities.count - 1 {
+                let nextActivity = validActivities[index + 1]
+                
+                if areConnected(prev: currentActivity, curr: nextActivity) {
+                    print("Bottom connected")
+                    currentUIModel.bottomConnected = true
+                }
             }
             
-            // Update activity end time if in future
-            if let startTime = currentUIModel.startTime, startTime < Date() {
-                if let endTime = currentUIModel.endTime, endTime > Date() {
-                    currentUIModel.endTime = Date()
-                }
-                
-                timelineItems.append(.activity(currentUIModel))
-            }
+            print("Appending: \(currentUIModel.category.name) to timeline")
+            timelineItems.append(.activity(currentUIModel))
         }
         
-        // Check if gap should exist at end
-        if let lastActivity = sortedActivities.last, let endTime = lastActivity.endTime, endTime <= Date() {
-            let gapDuration = Date().timeIntervalSince(endTime)
-            timelineItems.append(.gap(GapUIModel(id: "trailling-\(lastActivity.uiModel.id)", duration: gapDuration, startTime: endTime, endTime: Date())))
-            print("gap appended at the end")
+        // Append trailing gap
+        if let lastActivity = validActivities.last {
+            // Check if trailing gap is required
+            if let endTime = lastActivity.endTime {
+                // Add trailing gap
+                print("Appending trailing gap")
+                let duration = Date().timeIntervalSince(endTime)
+                timelineItems.append(.gap(GapUIModel(id: "trailling-\(lastActivity.uiModel.id)", duration: duration, startTime: endTime, endTime: Date())))
+            }
         }
         
         self.timelineItems = timelineItems
+        
+        print(timelineItems)
     }
     
     // Scorer
