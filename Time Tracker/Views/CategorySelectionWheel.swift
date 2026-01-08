@@ -49,7 +49,7 @@ struct CategorySelectionWheel: View {
                 }
                 
                 Button {
-                    
+                    onAdd?()
                 } label: {
                     Image(systemName: "plus")
                         .font(.footnote)
