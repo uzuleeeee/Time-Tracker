@@ -14,6 +14,19 @@ struct CategorySelectionWheel: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
+                Button {
+                    
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.primary)
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.bouncy)
+                
                 ForEach(categories) { category in
                     let isSelected = selected?.id == category.id
                     
@@ -31,7 +44,21 @@ struct CategorySelectionWheel: View {
                         .tint(.primary)
                     }
                     .buttonStyle(.bouncy)
+                    .id(category.id)
                 }
+                
+                Button {
+                    
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.primary)
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.bouncy)
             }
         }
     }
