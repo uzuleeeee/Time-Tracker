@@ -46,42 +46,70 @@ struct PersistenceController {
         }
         
         // Categories
-        let sleep       = createCategory("Sleep", "🛌", "5856D6")
-        let morning     = createCategory("Morning Routine", "🌅", "FFD60A")
-        let work        = createCategory("Work", "💼", "007AFF")
-        let coding      = createCategory("Coding", "💻", "AF52DE")
-        let meeting     = createCategory("Meeting", "👥", "5AC8FA")
-        let breakCat    = createCategory("Break", "☕️", "FFA500")
-        let lunch       = createCategory("Lunch / Dinner", "🍽️", "FF9F0A")
-        let errands     = createCategory("Errands", "🛒", "FF3B30")
-        let fitness     = createCategory("Fitness", "🏃‍♂️", "34C759")
-        let study       = createCategory("Study", "📚", "FFD60A")
-        let leisure     = createCategory("Leisure", "🎮", "FF2D55")
-        let meditation  = createCategory("Meditation", "🧘‍♂️", "5AC8FA")
+        let sleep           = createCategory("Sleep", "🛌", "5856D6")       // Purple
+        let eat             = createCategory("Eat", "🍽️", "FF9F0A")         // Orange
+        let work            = createCategory("Work", "💼", "007AFF")        // Blue
+        let study           = createCategory("Study", "📚", "FFD60A")       // Yellow
+        let commute         = createCategory("Commute", "🚗", "30B0C7")     // Teal
+        let entertainment   = createCategory("Entertainment", "🎮", "FF2D55") // Pink
+        let chores          = createCategory("Chores", "🏠", "8E8E93")      // Gray
+        let exercise        = createCategory("Exercise", "🏃‍♂️", "34C759")    // Green
+        let social          = createCategory("Social", "👥", "AF52DE")      // Purple
+        let breakCat        = createCategory("Break", "☕️", "FFA500")      // Orange
+        let selfCare        = createCategory("Self Care", "🧘‍♂️", "5AC8FA")   // Light Blue
+        let hobby           = createCategory("Hobby", "🎨", "FF3B30")       // Red
 
-        // Activities
-        createActivity(sleep, 0, 0, 420, "Zzz")
-        createActivity(morning, 7, 0, 30, "Coffee")
-        createActivity(fitness, 7, 30, 45, "Gym")
-        createActivity(breakCat, 8, 15, 15, "Scroll")
+        // MARK: - Sample Timeline
+        // 12:00 AM - 7:00 AM: Sleep
+        createActivity(sleep, 0, 0, 420, "Sleep")
+        
+        // 7:00 AM - 7:30 AM: Morning Routine -> Self Care
+        createActivity(selfCare, 7, 0, 30, "Morning Routine")
+        
+        // 7:30 AM - 8:15 AM: Gym -> Exercise
+        createActivity(exercise, 7, 30, 45, "Gym")
+        
+        // 8:15 AM - 8:45 AM: Breakfast -> Eat
+        createActivity(eat, 8, 15, 30, "Breakfast")
+        
+        // 8:45 AM - 9:15 AM: Commute
+        createActivity(commute, 8, 45, 30, "Drive to work")
 
-        createActivity(work, 8, 30, 90, "Emails")
-        createActivity(meeting, 10, 0, 30, nil)
-        createActivity(coding, 10, 30, 5, "Fixing bugs")
+        // 9:15 AM - 12:00 PM: Work
+        createActivity(work, 9, 15, 165, "Work")
+        
+        // 12:00 PM - 12:45 PM: Lunch -> Eat
+        createActivity(eat, 12, 0, 45, "Lunch")
+        
+        // 12:45 PM - 1:00 PM: Social
+//        createActivity(social, 12, 45, 15, "Chat with coworkers")
+        
+        // 1:00 PM - 3:00 PM: Work
+        createActivity(work, 13, 0, 120, "Meetings")
+        
+        // 3:00 PM - 3:15 PM: Break
+        createActivity(breakCat, 15, 0, 15, "Coffee break")
 
-        createActivity(lunch, 12, 0, 45, "Food")
-        createActivity(errands, 12, 45, 30, "Groceries")
-        createActivity(breakCat, 13, 15, 15, "Coffee refill")
+        // 3:15 PM - 5:00 PM: Work
+        createActivity(work, 15, 15, 105, "Wrap up")
 
-        createActivity(work, 13, 30, 60, "Admin")
-        createActivity(coding, 14, 30, 90, "New feature")
-        createActivity(meeting, 16, 0, 30, nil)
-        createActivity(work, 16, 30, 60, "Wrap up")
+        // 5:00 PM - 5:45 PM: Commute
+        createActivity(commute, 17, 0, 45, "Drive home")
+        
+        // 5:45 PM - 6:30 PM: Chores
+        createActivity(chores, 17, 45, nil, "Groceries")
 
-        createActivity(fitness, 18, 0, 45, "Run")
-//        createActivity(lunch, 19, 0, 45, "Dinner")
-        createActivity(leisure, 20, 0, 30, "Gaming")
-        createActivity(study, 21, 30, 5, "Reading")
+        // 6:30 PM - 7:30 PM: Dinner -> Eat
+        createActivity(eat, 18, 30, 60, "Dinner")
+        
+        // 7:30 PM - 8:30 PM: Hobby
+        createActivity(hobby, 19, 30, 60, "Guitar")
+        
+        // 8:30 PM - 9:30 PM: Entertainment
+        createActivity(entertainment, 20, 30, 60, "Gaming")
+        
+        // 9:30 PM - 10:30 PM: Study
+        createActivity(study, 21, 30, 60, "Reading")
         
         do {
             try viewContext.save()
@@ -134,13 +162,18 @@ extension PersistenceController {
         }
         
         let defaults: [(String, String, String)] = [
+            ("Sleep", "🛌", "5856D6"),
+            ("Eat", "🍽️", "FF9F0A"),
             ("Work", "💼", "007AFF"),
-            ("Fitness", "🏃‍♂️", "34C759"),
-            ("Coding", "💻", "AF52DE"),
-            ("Break", "☕️", "FFA500"),
             ("Study", "📚", "FFD60A"),
-            ("Meditation", "🧘‍♂️", "5AC8FA"),
-            ("Errands", "🛒", "FF3B30")
+            ("Commute", "🚗", "30B0C7"),
+            ("Entertainment", "🎮", "FF2D55"),
+            ("Chores", "🧹", "8E8E93"),
+            ("Exercise", "🏃‍♂️", "34C759"),
+            ("Social", "👥", "AF52DE"),
+            ("Break", "☕️", "FFA500"),
+            ("Self Care", "🧘‍♂️", "5AC8FA"),
+            ("Hobby", "🎨", "FF3B30")
         ]
         
         for (name, icon, hex) in defaults {
