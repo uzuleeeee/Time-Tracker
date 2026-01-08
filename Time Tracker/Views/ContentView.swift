@@ -128,7 +128,8 @@ struct ContentView: View {
             }
             .sheet(isPresented: $isShowingAddCategory) {
                 CategoryConfigurationView { emoji, name in
-                    
+                    viewModel.createCategory(icon: emoji, name: name)
+                    viewModel.syncCategories(categories: Array(categories))
                 }
                 .presentationDetents([.fraction(0.3)])
                 .presentationDragIndicator(.visible)

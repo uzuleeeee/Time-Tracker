@@ -70,6 +70,22 @@ class TimeTrackerViewModel: ObservableObject {
     
     // Actions
     
+    func createCategory(icon: String, name: String) {
+        print("Create category: \(icon) \(name)")
+        
+        withAnimation {
+            let newCategory = Category(context: viewContext)
+            newCategory.id = UUID()
+            newCategory.iconName = icon
+            newCategory.name = name
+            newCategory.colorHex = nil
+            
+            saveContext()
+            
+            selectedCategory = newCategory
+        }
+    }
+    
     func selectCategory(_ category: Category, currentActivity: Activity?) {
         print("Select category: \(category.uiModel.name)")
         
