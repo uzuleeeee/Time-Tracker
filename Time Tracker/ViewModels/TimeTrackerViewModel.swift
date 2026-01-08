@@ -24,6 +24,7 @@ class TimeTrackerViewModel: ObservableObject {
     @Published var inputText = ""
     @Published var scorerIsReady = false
     @Published var predictedCategories: [(Category, Float)] = []
+    @Published var topScore: Float = 0.0
     
     // Core Data
     let viewContext: NSManagedObjectContext
@@ -427,6 +428,7 @@ class TimeTrackerViewModel: ObservableObject {
             
             if let topMatch = mappedCategories.first {
                 self.selectedCategory = topMatch.0
+                self.topScore = topMatch.1
             }
         } catch {
             print("Failed to fetch categories: \(error)")
