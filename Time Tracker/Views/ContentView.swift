@@ -33,6 +33,7 @@ struct ContentView: View {
     @State private var selectedDate: Date = Date()
     @State private var inputText: String = ""
     @State private var configurationContext: ActivityConfigurationContext? = nil
+    @State private var isShowingAddCategory = false
     
     // Computed property to find running activity
     var currentActivity: Activity? {
@@ -76,7 +77,9 @@ struct ContentView: View {
                 VStack {
                     Divider()
                     
-                    CategorySelectionWheel(categories: viewModel.getPredictedCategories().isEmpty ? Array(categories) : Array(viewModel.getPredictedCategories()), selected: $viewModel.selectedCategory)
+                    CategorySelectionWheel(categories: viewModel.getPredictedCategories().isEmpty ? Array(categories) : Array(viewModel.getPredictedCategories()), selected: $viewModel.selectedCategory) {
+                        isShowingAddCategory = true
+                    }
                     
                     HStack {
                         TextField("What are you doing?", text: $viewModel.inputText)
@@ -104,6 +107,7 @@ struct ContentView: View {
                 .background(Color(.systemBackground))
             }
             .padding(.horizontal)
+            .padding(.bottom)
             .onAppear {
                 viewModel.updateModels(from: Array(activities))
                 viewModel.syncCategories(categories: Array(categories))
@@ -119,8 +123,15 @@ struct ContentView: View {
                 ActivityConfigurationView(startTime: context.startTime, endTime: context.endTime, categories: Array(categories), onSave: { name, selectedCategory, startTime, endTime in
                     viewModel.configureActivity(name: name, category: selectedCategory, startTime: startTime, endTime: endTime, activities: activities)
                 })
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $isShowingAddCategory) {
+                CategoryConfigurationView { emoji, name in
+                    
+                }
+                .presentationDetents([.fraction(0.3)])
+                .presentationDragIndicator(.visible)
             }
         }
     }

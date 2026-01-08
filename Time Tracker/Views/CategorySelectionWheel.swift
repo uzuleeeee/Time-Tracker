@@ -10,12 +10,13 @@ import SwiftUI
 struct CategorySelectionWheel: View {
     var categories: [Category]
     @Binding var selected: Category?
+    var onAdd: (() -> Void)? = nil
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 Button {
-                    
+                    onAdd?()
                 } label: {
                     Image(systemName: "plus")
                         .font(.footnote)
