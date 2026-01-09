@@ -22,20 +22,33 @@ struct CategoryConfigurationView: View {
     var body: some View {
         Form {
             Section {
-                HStack {
-                    TextField("Icon", text: $emoji)
-                        .lineLimit(1)
-                        .textFieldStyle(.plain)
-                        .frame(maxWidth: 50)
-                    
-                    Rectangle()
-                        .frame(width: 1, height: 20)
-                        .opacity(0.1)
+                HStack(spacing: 12) {
+                    ZStack {
+                        Color(.secondarySystemGroupedBackground)
+                        
+                        TextField("😀", text: $emoji)
+                            .font(.system(size: 30))
+                            .multilineTextAlignment(.center)
+                            .textFieldStyle(.plain)
+                            .onChange(of: emoji) { newValue in
+                                if newValue.count > 1 {
+                                    emoji = String(newValue.prefix(1))
+                                }
+                            }
+                            .tint(.primary)
+                    }
+                    .frame(width: 50, height: 50)
+                    .clipShape(Circle())
                     
                     TextField("Name", text: $name)
-                        .lineLimit(1)
-                        .textFieldStyle(.plain)
+                        .padding(.horizontal)
+                        .frame(height: 50)
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .tint(.primary)
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
             }
             
             Button {
@@ -50,7 +63,7 @@ struct CategoryConfigurationView: View {
                     .frame(maxWidth: .infinity)
                     .foregroundStyle(isValid ? Color(.systemBackground) : Color(.systemBackground).opacity(0.7))
                     .background(isValid ? Color(uiColor: .label) : .gray.opacity(0.3))
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
             }
             .buttonStyle(.borderless)
             .listRowBackground(Color.clear)
