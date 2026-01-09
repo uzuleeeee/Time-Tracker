@@ -23,7 +23,7 @@ struct CategoryConfigurationView: View {
     var onSave: (String, String) -> Void
     
     private var isValid: Bool {
-        emoji.isEmpty == false && name.isEmpty == false
+        emoji.isBlank == false && name.isBlank == false
     }
     
     var body: some View {
