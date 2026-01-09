@@ -10,6 +10,13 @@ import SwiftUI
 struct CategoryConfigurationView: View {
     @Environment(\.dismiss) var dismiss
     
+    enum FocusField {
+        case emoji
+        case name
+    }
+    
+    @FocusState private var focusedField: FocusField?
+    
     @State private var emoji: String = ""
     @State private var name: String = ""
     
@@ -30,9 +37,12 @@ struct CategoryConfigurationView: View {
                             .font(.system(size: 30))
                             .multilineTextAlignment(.center)
                             .textFieldStyle(.plain)
+                            .focused($focusedField, equals: .emoji)
                             .onChange(of: emoji) { newValue in
-                                if newValue.count > 1 {
+                                if newValue.count >= 1 {
                                     emoji = String(newValue.prefix(1))
+                                    
+                                    focusedField = .name
                                 }
                             }
                             .tint(.primary)
@@ -46,6 +56,7 @@ struct CategoryConfigurationView: View {
                         .background(Color(.secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .tint(.primary)
+                        .focused($focusedField, equals: .name)
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
@@ -69,6 +80,9 @@ struct CategoryConfigurationView: View {
             .listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets())
             .disabled(!isValid)
+        }
+        .onAppear {
+            focusedField = .emoji
         }
     }
 }
