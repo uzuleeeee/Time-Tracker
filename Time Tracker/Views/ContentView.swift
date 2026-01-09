@@ -57,6 +57,7 @@ struct ContentView: View {
                             configurationContext = ActivityConfigurationContext(startTime: startTime, endTime: endTime)
                             print(startTime, endTime)
                         }
+                        .scrollDismissesKeyboard(.immediately)
                         
                         Button {
                             configurationContext = ActivityConfigurationContext(startTime: Date(), endTime: Date())
@@ -131,7 +132,7 @@ struct ContentView: View {
                     viewModel.createCategory(icon: emoji, name: name)
                     viewModel.syncCategories(categories: Array(categories))
                 }
-                .presentationDetents([.fraction(0.3)])
+                .presentationDetents([.fraction(0.25)])
                 .presentationDragIndicator(.visible)
             }
         }
