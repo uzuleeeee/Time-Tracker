@@ -30,6 +30,8 @@ struct ContentView: View {
     )
     private var categories: FetchedResults<Category>
     
+    @FocusState private var isInputFocused: Bool
+    
     @State private var selectedDate: Date = Date()
     @State private var inputText: String = ""
     @State private var configurationContext: ActivityConfigurationContext? = nil
@@ -86,6 +88,7 @@ struct ContentView: View {
                         TextField("What are you doing?", text: $viewModel.inputText)
                             .lineLimit(1)
                             .textFieldStyle(.plain)
+                            .focused($isInputFocused)
                         Button {
                             if let selectedCategory = viewModel.selectedCategory {
                                 if let currentActivity {
@@ -93,6 +96,7 @@ struct ContentView: View {
                                 }
                                 viewModel.startActivity(for: selectedCategory)
                                 viewModel.updateModels(from: Array(activities))
+                                isInputFocused = false
                             }
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
