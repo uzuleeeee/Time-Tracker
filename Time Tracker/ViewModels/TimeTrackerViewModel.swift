@@ -21,9 +21,13 @@ class TimeTrackerViewModel: ObservableObject {
     private let scorer: Scorer
     private var cancellables = Set<AnyCancellable>()
     
+    private var isManuallySelected = false
+    private var isUpdatingFromPrediction = false
+    
     @Published var inputText = ""
     @Published var scorerIsReady = false
     @Published var predictedCategories: [(Category, Float)] = []
+    @Published var topScore: Float = 0.0
     
     // Core Data
     let viewContext: NSManagedObjectContext
@@ -53,13 +57,35 @@ class TimeTrackerViewModel: ObservableObject {
             .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] text in
-                self?.predict(text)
+                guard let self = self else { return }
+                
+                if text.isEmpty {
+                    self.predict(text)
+                    return
+                }
+                
+                if self.isManuallySelected {
+                    return
+                }
+                
+                self.predict(text)
             }
             .store(in: &cancellables)
     }
     
     // UI state
-    @Published var selectedCategory: Category?
+    @Published var selectedCategory: Category? {
+        didSet {
+            if selectedCategory == nil {
+                isManuallySelected = false
+                return
+            }
+            
+            if !isUpdatingFromPrediction {
+                isManuallySelected = true
+            }
+        }
+    }
     @Published var timelineItems: [TimelineItem] = []
     
     let scrollSubject = PassthroughSubject<ScrollAction, Never>()
@@ -68,6 +94,22 @@ class TimeTrackerViewModel: ObservableObject {
     private var currentLiveActivity: ActivityKit.Activity<TimeTrackerWidgetAttributes>?
     
     // Actions
+    
+    func createCategory(icon: String, name: String) {
+        print("Create category: \(icon) \(name)")
+        
+        withAnimation {
+            let newCategory = Category(context: viewContext)
+            newCategory.id = UUID()
+            newCategory.iconName = icon
+            newCategory.name = name
+            newCategory.colorHex = nil
+            
+            saveContext()
+            
+            selectedCategory = newCategory
+        }
+    }
     
     func selectCategory(_ category: Category, currentActivity: Activity?) {
         print("Select category: \(category.uiModel.name)")
@@ -342,7 +384,9 @@ class TimeTrackerViewModel: ObservableObject {
     func predict(_ text: String) {
         if text.isEmpty {
             self.predictedCategories = []
+            self.isUpdatingFromPrediction = true
             self.selectedCategory = nil
+            self.isUpdatingFromPrediction = false
             return
         }
         
@@ -426,7 +470,10 @@ class TimeTrackerViewModel: ObservableObject {
             self.predictedCategories = mappedCategories
             
             if let topMatch = mappedCategories.first {
+                self.isUpdatingFromPrediction = true
                 self.selectedCategory = topMatch.0
+                self.isUpdatingFromPrediction = false
+                self.topScore = topMatch.1
             }
         } catch {
             print("Failed to fetch categories: \(error)")

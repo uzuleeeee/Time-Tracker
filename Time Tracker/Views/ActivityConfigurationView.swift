@@ -34,6 +34,7 @@ struct ActivityConfigurationView: View {
                     .onChange(of: inputText) { newText in
                         predict(newText)
                     }
+                    .tint(.primary)
                 
                 CategorySelectionWheel(categories: predictedCategories.isEmpty ? Array(categories) : predictedCategories, selected: $selectedCategory)
             }
@@ -58,7 +59,7 @@ struct ActivityConfigurationView: View {
                     .frame(maxWidth: .infinity)
                     .foregroundStyle(isValid ? Color(.systemBackground) : Color(.systemBackground).opacity(0.7))
                     .background(isValid ? Color(uiColor: .label) : .gray.opacity(0.3))
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
             }
             .buttonStyle(.borderless)
             .listRowBackground(Color.clear)

@@ -46,7 +46,7 @@ struct BubbleModifier: ViewModifier {
     var roundTopRight: Bool = true
     var roundBottomRight: Bool = true
     
-    var selectionColor: Color = Color.primary.opacity(0.5)
+    var selectionColor: Color = Color.primary.opacity(0.8)
     
     func body(content: Content) -> some View {
         let shape = UnevenRoundedRectangle(
@@ -65,13 +65,13 @@ struct BubbleModifier: ViewModifier {
             .padding(.horizontal, size.horizontalPadding)
             .background(
                 shape
-                    .fill(Color(.secondarySystemBackground))
+                    .fill(Color(.tertiarySystemFill))
             )
             .overlay(
                 shape
                     .strokeBorder(
                         isSelected ? selectionColor : .clear,
-                        lineWidth: isSelected ? 2 : 0
+                        lineWidth: isSelected ? 1 : 0
                     )
             )
     }

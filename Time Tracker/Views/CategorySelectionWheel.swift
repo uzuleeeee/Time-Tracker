@@ -10,27 +10,69 @@ import SwiftUI
 struct CategorySelectionWheel: View {
     var categories: [Category]
     @Binding var selected: Category?
+    var onAdd: (() -> Void)? = nil
     
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(categories) { category in
-                    let isSelected = selected?.id == category.id
-                    
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
                     Button {
-                        if isSelected {
-                            selected = nil
-                        } else {
-                            selected = category
-                        }
+                        onAdd?()
                     } label: {
-                        LabelView(
-                            uiModel: category.uiModel,
-                            isSelected: isSelected
-                        )
-                        .tint(.primary)
+                        Image(systemName: "plus")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                            .padding(4)
+                            .background(Color(.tertiarySystemFill))
+                            .clipShape(Circle())
                     }
                     .buttonStyle(.bouncy)
+                    
+                    ForEach(categories) { category in
+                        let isSelected = selected?.id == category.id
+                        
+                        Button {
+                            if isSelected {
+                                selected = nil
+                            } else {
+                                selected = category
+                            }
+                        } label: {
+                            LabelView(
+                                uiModel: category.uiModel,
+                                isSelected: isSelected
+                            )
+                            .tint(.primary)
+                        }
+                        .buttonStyle(.bouncy)
+                        .id(category.id)
+                    }
+                    
+                    Button {
+                        onAdd?()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                            .padding(4)
+                            .background(Color(.tertiarySystemFill))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.bouncy)
+                }
+            }
+            .onChange(of: selected) { newCategory in
+                if let newCategory {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        proxy.scrollTo(newCategory.id, anchor: .center)
+                    }
+                }
+            }
+            .onAppear {
+                if let category = selected {
+                    proxy.scrollTo(category.id, anchor: .center)
                 }
             }
         }
@@ -47,6 +89,7 @@ struct CategorySelectionWheel: View {
                 categories: categories,
                 selected: $currentSelection
             )
+            .border(.red)
             .padding()
             .padding(.vertical, 10)
         }
