@@ -65,7 +65,7 @@ struct BubbleModifier: ViewModifier {
             .padding(.horizontal, size.horizontalPadding)
             .background(
                 shape
-                    .fill(Color(.secondarySystemBackground))
+                    .fill(Color(.tertiarySystemFill))
             )
             .overlay(
                 shape

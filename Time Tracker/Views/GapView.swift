@@ -55,7 +55,7 @@ struct GapView: View {
                             .fontWeight(.bold)
                             .foregroundStyle(.primary)
                             .padding(4)
-                            .background(Color(.systemGray6))
+                            .background(Color(.tertiarySystemFill))
                             .clipShape(Circle())
                     }
                     .buttonStyle(.bouncy)
