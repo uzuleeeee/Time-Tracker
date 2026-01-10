@@ -82,8 +82,10 @@ struct CategoryConfigurationView: View {
             .disabled(!isValid)
         }
         .onAppear {
-            focusedField = .emoji
-        }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                focusedField = .emoji
+            }
+        }   
     }
 }
 
