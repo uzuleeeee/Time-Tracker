@@ -59,7 +59,7 @@ class TimeTrackerViewModel: ObservableObject {
             .sink { [weak self] text in
                 guard let self = self else { return }
                 
-                if text.isEmpty {
+                if text.isBlank {
                     self.predict(text)
                     return
                 }
@@ -135,7 +135,7 @@ class TimeTrackerViewModel: ObservableObject {
             newActivity.id = UUID()
             newActivity.startTime = Date()
             newActivity.category = category
-            newActivity.name = inputText.isEmpty ? nil : inputText
+            newActivity.name = inputText.isBlank ? nil : inputText
             newActivity.endTime = nil // Explicitly nil implies running
             
             saveContext()
@@ -143,7 +143,7 @@ class TimeTrackerViewModel: ObservableObject {
             startLiveActivity(newActivity)
             
             if let categoryName = category.name {
-                scorer.updateDescriptions(label: categoryName, description: inputText.isEmpty ? inputText : "")
+                scorer.updateDescriptions(label: categoryName, description: inputText.isBlank ? inputText : "")
             }
             
             scrollSubject.send(.bottom)
@@ -186,7 +186,7 @@ class TimeTrackerViewModel: ObservableObject {
         withAnimation {
             let newActivity = Activity(context: viewContext)
             newActivity.id = UUID()
-            newActivity.name = name.isEmpty ? nil : name
+            newActivity.name = name.isBlank ? nil : name
             newActivity.category = category
             newActivity.startTime = startTime
             newActivity.endTime = endTime
@@ -382,7 +382,7 @@ class TimeTrackerViewModel: ObservableObject {
     // Scorer
     
     func predict(_ text: String) {
-        if text.isEmpty {
+        if text.isBlank {
             self.predictedCategories = []
             self.isUpdatingFromPrediction = true
             self.selectedCategory = nil

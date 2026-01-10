@@ -69,7 +69,7 @@ struct ActivityConfigurationView: View {
     }
     
     private func predict(_ text: String) {
-        if text.isEmpty {
+        if text.isBlank {
             self.predictedCategories = []
             self.selectedCategory = nil
             return
