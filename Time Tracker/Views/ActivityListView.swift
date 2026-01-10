@@ -18,7 +18,7 @@ struct ActivityListView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .trailing, spacing: 3) {
+                VStack(spacing: 2) {
                     ForEach(viewModel.timelineItems) { item in
                         switch item {
                         case .activity(let uiModel):
@@ -37,6 +37,7 @@ struct ActivityListView: View {
                                     }
                                 }
                             )
+                            .frame(maxWidth: .infinity, alignment: .trailing)
                         case .gap(let uiModel):
                             let isLastItem = item.id == viewModel.timelineItems.last?.id
                             
@@ -44,6 +45,7 @@ struct ActivityListView: View {
                                 onAdd?(uiModel.startTime, isLastItem ? Date() : uiModel.endTime)
                             }
                             .id(uiModel.id)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
                         }
                     }
                     
