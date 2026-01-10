@@ -119,7 +119,7 @@ struct ActivityListView: View {
                     case .bottom:
                         proxy.scrollTo("Bottom", anchor: .bottom)
                     case .id(let id):
-                        proxy.scrollTo(id, anchor: .center)
+                        proxy.scrollTo(id, anchor: .bottom)
                     }
                 }
             }
